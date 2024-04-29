@@ -12,8 +12,9 @@ CFLAGS = -nostdlib -fno-builtin -march=rv64g -g -Wall
 CFLAGS += -mcmodel=medany
 CFLAGS += -I./includes
 
-QEMU = /opt/qemu-riscv64/bin/qemu-system-riscv64 # qemu 9.0.0
-
+# QEMU = /opt/qemu-riscv64/bin/qemu-system-riscv64 # qemu 9.0.0
+# QEMU = qemu-system-riscv64 # qemu 4.3
+QEMU = /usr/local/bin/qemu-system-riscv64 # qemu 9.0
 CPUS := 1
 
 QFLAGS = -nographic -smp ${CPUS} -machine virt -bios none
