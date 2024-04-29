@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.vue": "vue",
+        "*.ld": "plaintext",
+        "types.h": "c",
+        "defs.h": "c",
+        "riscv.h": "c",
+        "spinlock.h": "c"
+    }
+}
