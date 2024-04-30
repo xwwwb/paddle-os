@@ -8,6 +8,7 @@ int main()
     {
         // 初始化控制台
         consoleinit();
+        asm volatile("wfi");
     }
     else
     {

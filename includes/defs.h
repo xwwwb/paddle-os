@@ -8,3 +8,6 @@ void consoleinit();
 
 // spinlock.c
 void initlock(struct spinlock *lk, char *name);
+
+// uart.c
+void uartinit(void);

@@ -19,7 +19,7 @@ void consoleinit(void)
 {
     initlock(&cons.lock, "cons");
 
-    // uartinit();
+    uartinit();
 
     // // connect read and write system calls
     // // to consoleread and consolewrite.

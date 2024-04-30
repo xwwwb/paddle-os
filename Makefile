@@ -12,7 +12,8 @@ SRCS_C = \
 	$K/main.c \
 	$K/proc.c \
 	$K/console.c \
-	$K/spinlock.c
+	$K/spinlock.c \
+	$K/uart.c
 
 
 
