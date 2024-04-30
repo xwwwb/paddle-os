@@ -13,7 +13,8 @@ SRCS_C = \
 	$K/proc.c \
 	$K/console.c \
 	$K/spinlock.c \
-	$K/uart.c
+	$K/uart.c \
+	$K/file.c
 
 
 
