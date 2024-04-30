@@ -14,7 +14,8 @@ SRCS_C = \
 	$K/console.c \
 	$K/spinlock.c \
 	$K/uart.c \
-	$K/file.c
+	$K/file.c \
+	$K/printf.c
 
 
 
@@ -37,6 +38,10 @@ run: all
 debug: all
 	${QEMU} ${QFLAGS} -kernel kernel.elf -s -S &
 	@${GDB} kernel.elf -q -x ./gdbinit
+
+qemu-debug: all
+	@echo "start qemu debug"
+	${QEMU} ${QFLAGS} -kernel kernel.elf -s -S
 
 %.o : %.c
 	${CC} ${CFLAGS} -c -o $@ $<

@@ -1,7 +1,7 @@
 // 初始化寄存器
+#include "types.h"
 #include "params.h"
 #include "riscv.h"
-#include "types.h"
 
 // main.c中定义
 void main();

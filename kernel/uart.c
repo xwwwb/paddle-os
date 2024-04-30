@@ -17,9 +17,9 @@ struct uart_16550a_regs {
 
 #define LCR_BAUD_LATCH (1 << 7)  // 修改波特率的模式
 #define LCR_EIGHT_BITS (3 << 0)  // 修改字长是8 没有校验
-
-#define IER_RX_ENABLE (1 << 0)  // rx 使能
-#define IER_TX_ENABLE (1 << 1)  // tx 使能
+#define LSR_TX_IDLE (1 << 5)     // THR可以接受其他字符了
+#define IER_RX_ENABLE (1 << 0)   // rx 使能
+#define IER_TX_ENABLE (1 << 1)   // tx 使能
 
 #define FCR_FIFO_ENABLE (1 << 0)
 #define FCR_FIFO_CLEAR (3 << 1)
@@ -29,6 +29,7 @@ volatile static struct uart_16550a_regs *regs =
     (struct uart_16550a_regs *)UART0;
 
 struct spinlock uart_tx_lock;
+extern volatile int panicked;  // printf定义的 如果内核崩溃 所有输出都被禁止
 
 void uartinit(void) {
   // 关中断
@@ -42,7 +43,8 @@ void uartinit(void) {
   regs->IER_DLM = 0x00;
 
   // 设置字长为8 和无校验 关闭设置波特率的开关
-  regs->LCR = regs->LCR | LCR_EIGHT_BITS;
+  // 注意这里是等于 不是|=
+  regs->LCR = LCR_EIGHT_BITS;
 
   // 重设并开启FIFO
   regs->IIR_FCR = (FCR_FIFO_ENABLE | FCR_FIFO_CLEAR);
@@ -52,4 +54,21 @@ void uartinit(void) {
 
   // 初始化锁
   initlock(&uart_tx_lock, "uart");
+}
+
+// 输出字符到设备 内核使用这个函数
+void uartputc_sync(int c) {
+  // 关中断
+
+  // 崩溃时 所有CPU都死循环
+  if (panicked) {
+    for (;;)
+      ;
+  }
+
+  while ((regs->LSR & LSR_TX_IDLE) == 0)
+    ;
+  regs->RBR_THR_DLL = c;
+
+  // 开中断
 }
