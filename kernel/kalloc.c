@@ -3,8 +3,8 @@
 #include "proc.h"
 #include "spinlock.h"
 #include "memlayout.h"
-#include "defs.h"
 #include "riscv.h"
+#include "defs.h"
 // 由链接脚本提供的地址
 extern char end[];
 
@@ -27,6 +27,7 @@ void kinit() {
   initlock(&kmem.lock, "kmem");
   // 抹掉堆空间
   freerange(end, (void *)PHYMEMSTOP);
+  printf("physical memory init:\t\t done!\n");
 }
 
 // 抹掉空间
@@ -36,7 +37,6 @@ void freerange(void *pa_start, void *pa_end) {
   for (; addr_p + PGSIZE <= (char *)pa_end; addr_p += PGSIZE) {
     kfree(addr_p);
   }
-  printf("memory init done!\n");
 }
 
 // 清除一个页的物理内存 并且更新空闲链表

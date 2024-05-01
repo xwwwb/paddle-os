@@ -35,7 +35,7 @@ all: ${OBJS}
 
 # 启动
 run: all
-	${QEMU} ${QFLAGS} -kernel kernel.elf
+	@${QEMU} ${QFLAGS} -kernel kernel.elf
 
 # 调试
 debug: all

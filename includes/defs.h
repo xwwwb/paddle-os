@@ -34,4 +34,8 @@ void *kalloc();  // 分配一个页的物理内存
 void *memset(void *, int, uint);  // 内存赋值
 
 // vm.c
-void kvminit(void);
+void kvminit(void);  // 内核虚拟内存初始化
+void kvmmap(pagetable_t, uint64, uint64, uint64, int);  // 内核虚拟内存映射
+int mappages(pagetable_t, uint64, uint64, uint64, int);  // 页映射
+pte_t *walk(pagetable_t, uint64, int);                   // 请求pte
+void kvminithart(void);                                  // 开启页表

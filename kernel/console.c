@@ -1,5 +1,6 @@
 // 控制台
 #include "types.h"
+#include "riscv.h"
 #include "defs.h"
 #include "file.h"
 #include "proc.h"

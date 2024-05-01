@@ -1,8 +1,8 @@
 #include "types.h"
+#include "riscv.h"
 #include "defs.h"
 #include "proc.h"
 #include "spinlock.h"
-#include "riscv.h"
 
 // 初始化自旋锁
 void initlock(struct spinlock *lk, char *name) {
