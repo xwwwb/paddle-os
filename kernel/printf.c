@@ -61,7 +61,7 @@ static void printptr(uint64 x) {
   }
 }
 
-// 格式化输出字符到控制台
+// 格式化输出字符到控制台 kernel使用
 void printf(char *fmt, ...) {
   // 这里要用到c语言的标准库的可变长参数了
   va_list ap;

@@ -95,3 +95,33 @@ static inline void w_pmpaddr0(uint64 x) {
 
 // 页表是一个指向64位长度空间的指针
 typedef uint64 *pagetable_t;
+
+#define SSTATUS_SIE (1L << 1)  // S模式下的中断使能位
+
+// 拿s状态的sstatus寄存器
+static inline uint64 r_sstatus() {
+  uint64 x;
+  asm volatile("csrr %0, sstatus" : "=r"(x));
+  return x;
+}
+// 写s状态的sstatus寄存器
+static inline void w_sstatus(uint64 x) {
+  asm volatile("csrw sstatus, %0" : : "r"(x));
+}
+
+// 关中断
+static inline void intr_off() {
+  // sstatus的SIE位清零
+  w_sstatus(r_sstatus() & ~SSTATUS_SIE);
+}
+// 开中断
+static inline void intr_on() {
+  // sstatus的SIE位置1
+  w_sstatus(r_sstatus() | SSTATUS_SIE);
+}
+
+// 拿中断状态
+static inline int intr_get() {
+  uint64 x = r_sstatus();
+  return (x & SSTATUS_SIE) != 0;
+}

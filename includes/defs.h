@@ -13,6 +13,8 @@ void initlock(struct spinlock *, char *);  // 初始化锁
 void acquire(struct spinlock *);           // 获取锁
 void release(struct spinlock *);           // 释放锁
 int holding(struct spinlock *);            // 检查是否持有锁
+void push_off(void);                       // 关中断
+void pop_off(void);                        // 开中断
 
 // uart.c
 void uartinit(void);      // 初始化uart设备

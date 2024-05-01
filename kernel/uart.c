@@ -60,7 +60,7 @@ void uartinit(void) {
 // 输出字符到设备 内核使用这个函数
 void uartputc_sync(int c) {
   // 关中断
-
+  push_off();
   // 崩溃时 所有CPU都死循环
   if (panicked) {
     for (;;)
@@ -72,4 +72,5 @@ void uartputc_sync(int c) {
   regs->RBR_THR_DLL = c;
 
   // 开中断
+  pop_off();
 }

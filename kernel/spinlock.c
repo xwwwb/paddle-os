@@ -1,6 +1,8 @@
 #include "types.h"
-#include "spinlock.h"
 #include "defs.h"
+#include "proc.h"
+#include "spinlock.h"
+#include "riscv.h"
 
 // 初始化自旋锁
 void initlock(struct spinlock *lk, char *name) {
@@ -13,7 +15,7 @@ void initlock(struct spinlock *lk, char *name) {
 void acquire(struct spinlock *lk) {
   // 关中断
   // 如果不关中断 临界区代码如果有可能触发中断 会导致死锁
-  // push_off();
+  push_off();
 
   // 判断是否持有锁
   if (holding(lk)) {
@@ -57,6 +59,7 @@ void release(struct spinlock *lk) {
   __sync_lock_release(&lk->locked);
 
   // 开中断
+  pop_off();
 }
 
 // 检查当前CPU是否持有锁
@@ -64,4 +67,41 @@ int holding(struct spinlock *lock) {
   int r;
   r = (lock->locked && lock->cpu == mycpu());
   return r;
+}
+
+// push_off和pop_off在开关中断的基础上增加了层级关系
+// 保证了开关中断的嵌套调用 还保证了最还原最外层的中断状态
+void push_off(void) {
+  // 拿到当前的中断状态
+  int old_intr_status = intr_get();
+
+  // 关中断
+  intr_off();
+  // 如果当前是第一层关中断 那么记录之前的状态
+  // 如果是第二层就没必要记录了 因为肯定是关的状态
+  if (mycpu()->noff == 0) {
+    mycpu()->intena = old_intr_status;
+  }
+  // 层级加一
+  mycpu()->noff += 1;
+}
+
+void pop_off(void) {
+  // 拿到当前处理器
+  struct cpu *c = mycpu();
+  // 如果当前处理器没有关中断 说明单独出现了pop_off 出错
+  if (intr_get()) {
+    panic("pop_off error!");
+  }
+  // 如果层级小于1 也说明没有push_off就执行了pop_off 出错
+  if (c->noff < 1) {
+    panic("pop_off error");
+  }
+  c->noff -= 1;
+
+  // 如果层级为0 说明是最外层的pop_off 需要开中断
+  // 如果层级不是0 说明外层还可以调用pop_off 由外层的pop_off来开中断
+  if (c->noff == 0 && c->intena) {
+    intr_on();
+  }
 }

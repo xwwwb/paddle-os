@@ -1,6 +1,6 @@
 // 物理内存页分配
 #include "types.h"
-
+#include "proc.h"
 #include "spinlock.h"
 #include "memlayout.h"
 #include "defs.h"
