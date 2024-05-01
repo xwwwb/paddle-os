@@ -9,6 +9,7 @@
         "memlayout.h": "c",
         "file.h": "c",
         "stdarg.h": "c",
-        "params.h": "c"
+        "params.h": "c",
+        "proc.h": "c"
     }
 }

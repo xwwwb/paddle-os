@@ -1,13 +1,14 @@
 // 控制台
+#include "types.h"
 #include "defs.h"
 #include "file.h"
+#include "proc.h"
 #include "spinlock.h"
-#include "types.h"
 
 // 退格键
 #define BACKSPACE 0x100
 
-// 向控制台输出一个字符
+// 向控制台输出一个字符 只允许kernel使用
 void consputc(int c) {
   if (c == BACKSPACE) {
     // 输出退格符然后用空格覆盖

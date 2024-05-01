@@ -15,7 +15,10 @@ SRCS_C = \
 	$K/spinlock.c \
 	$K/uart.c \
 	$K/file.c \
-	$K/printf.c
+	$K/printf.c \
+	$K/kalloc.c \
+	$K/string.c \
+	$K/vm.c
 
 
 

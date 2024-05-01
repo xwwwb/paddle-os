@@ -1,7 +1,8 @@
+#include "types.h"
 #include "defs.h"
 #include "memlayout.h"
 #include "spinlock.h"
-#include "types.h"
+
 // http://byterunner.com/16550.html
 struct uart_16550a_regs {
   uint8 RBR_THR_DLL;  // 0x00 Receiver Buffer Register / Transmitter Holding

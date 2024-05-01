@@ -1,4 +1,4 @@
-// 定义一些riscv寄存器操作函数
+// 定义一些riscv平台的操作 包括读写常规寄存器和特权寄存器
 
 // 读取当前的hartid
 static inline uint64 r_mhartid() {
@@ -85,3 +85,13 @@ static inline void w_pmpcfg0(uint64 x) {
 static inline void w_pmpaddr0(uint64 x) {
   asm volatile("csrw pmpaddr0, %0" : : "r"(x));
 }
+
+// 内存对齐配置
+#define PGSIZE 4096
+#define PGSHIFT 12
+// 向上对齐和向下对齐
+#define PGROUNDUP(sz) (((sz) + PGSIZE - 1) & ~(PGSIZE - 1))
+#define PGROUNDDOWN(a) (((a)) & ~(PGSIZE - 1))
+
+// 页表是一个指向64位长度空间的指针
+typedef uint64 *pagetable_t;

@@ -1,6 +1,7 @@
 #include <stdarg.h>
-
+#include "types.h"
 #include "defs.h"
+#include "proc.h"
 #include "spinlock.h"
 
 // 标记内核是否崩溃
@@ -39,7 +40,7 @@ static void printint(int num, int base, int sign) {
   if (sign) {
     buf[i++] = '-';
   }
-  while(--i >= 0) {
+  while (--i >= 0) {
     consputc(buf[i]);
   }
 }
@@ -71,6 +72,7 @@ void printf(char *fmt, ...) {
   locking = pr.locking;
   if (locking) {
     // 获取锁
+    acquire(&pr.lock);
   }
 
   if (fmt == 0) {
@@ -131,6 +133,7 @@ void printf(char *fmt, ...) {
 
   // 释放锁
   if (locking) {
+    release(&pr.lock);
   }
 }
 
@@ -138,7 +141,7 @@ void printf(char *fmt, ...) {
 void panic(char *s) {
   // 这里希望能够立即输出信息 关掉printf的锁要求
   pr.locking = 0;
-  printf("pannic: ");
+  printf("panic: ");
   printf(s);
   printf("\n");
   panicked = 1;  // 禁止所有CPU的uart输出
@@ -147,6 +150,6 @@ void panic(char *s) {
 }
 
 void printfinit(void) {
-  initlock(&pr.lock, "pr");
+  initlock(&pr.lock, "printf");
   pr.locking = 1;
 }
