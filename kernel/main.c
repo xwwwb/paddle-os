@@ -11,7 +11,7 @@ int main() {
     printf("paddle-os kernel is booting......\n");
     kinit();        // 物理内存页分配初始化
     kvminit();      // 内核的页表初始化
-    kvminithart();  // 开启页表
+    kvminithart();  // 开启内核页表
     asm volatile("wfi");
   } else {
     while (1) {

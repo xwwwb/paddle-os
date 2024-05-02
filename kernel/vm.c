@@ -59,10 +59,21 @@ void kvminit(void) {
 // 开启分页
 // 硬件的页表寄存器存入内核页表
 void kvminithart() {
-  // sfence_vma();
+  /**
+   * 但如果修改了 satp
+   * 寄存器，说明内核切换到了一个与先前映射方式完全不同的页表。
+   * 此时快表里面存储的映射已经失效了，这种情况下内核要在修改 satp
+   * 的指令后面马上使用 sfence.vma 指令刷新清空整个 TLB。
+   * 同样，我们手动修改一个页表项之后，也修改了映射，但 TLB 并不会自动刷新清空，
+   * 我们也需要使用 sfence.vma 指令刷新整个 TLB。
+   * 注：可以在 sfence.vma 指令后面加上一个虚拟地址，
+   * 这样 sfence.vma 只会刷新TLB中关于这个虚拟地址的单个映射项。
+   * 特权指令集P65
+   */
+  sfence_vma();
   // 写satp寄存器
   w_satp(MAKE_SATP(kernel_pagetable));
-  // sfence_vma();
+  sfence_vma();
   printf("memory paging init: \t\t done!\n ");
 };
 

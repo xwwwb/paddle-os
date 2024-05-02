@@ -86,9 +86,17 @@ static inline void w_pmpaddr0(uint64 x) {
   asm volatile("csrw pmpaddr0, %0" : : "r"(x));
 }
 
-// 开启riscv的sv39分页模式
+// 开启riscv的sv39分页模式 S U的仿存走分页 M模式不讨论
+// satp的60-64位存mode mode为8是sv39模式
 #define SATP_SV39 (8L << 60)
+// satp的PPN位存的是物理页号
 #define MAKE_SATP(pagetable) (SATP_SV39 | (((uint64)pagetable) >> 12))
+
+// 刷新快表TLB
+static inline void sfence_vma() {
+  // zero, zero是清除所有快表项
+  asm volatile("sfence.vma zero, zero");
+}
 
 // 内存对齐配置
 #define PGSIZE 4096  // 页的大小是4k
@@ -115,10 +123,10 @@ static inline void w_pmpaddr0(uint64 x) {
 #define PX(level, va) ((((uint64)(va)) >> PXSHIFT(level)) & PXMASK)
 
 // PTE中的地址号转物理地址
-// 具体为什么这么处理 是硬件规定的？
-// PTE中低10位是FLAG位 左移12是因为PTE中存的地址是真实地址除以4k的号码 页号
+// 具体为什么这么处理 是硬件规定的
+// PTE中低10位是FLAG位 先右移10位去掉flag 再左移12得到真实地址
 #define PTE2PA(pte) (((pte) >> 10) << 12)
-// 物理地址转PTE中的号码 右移12位是除去了10位FLAG又除以4k 拿到是页号
+// 物理地址转PTE中的号码 右移12是为了得到页号 左移10位是腾出flag位
 #define PA2PTE(pa) (((((uint64)pa)) >> 12) << 10)
 
 // pte是页表项一个64位数
