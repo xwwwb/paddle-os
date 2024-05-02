@@ -3,8 +3,9 @@
 #include "riscv.h"
 #include "defs.h"
 #include "file.h"
-#include "proc.h"
+
 #include "spinlock.h"
+#include "proc.h"
 
 // 退格键
 #define BACKSPACE 0x100

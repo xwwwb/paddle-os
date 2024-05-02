@@ -1,10 +1,10 @@
 // 物理内存页分配
 #include "types.h"
-#include "proc.h"
 #include "spinlock.h"
 #include "memlayout.h"
 #include "riscv.h"
 #include "defs.h"
+#include "proc.h"
 // 由链接脚本提供的地址
 extern char end[];
 

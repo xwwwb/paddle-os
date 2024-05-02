@@ -39,3 +39,7 @@ void kvmmap(pagetable_t, uint64, uint64, uint64, int);  // 内核虚拟内存映
 int mappages(pagetable_t, uint64, uint64, uint64, int);  // 页映射
 pte_t *walk(pagetable_t, uint64, int);                   // 请求pte
 void kvminithart(void);                                  // 开启页表
+
+// proc.c
+void procinit(void);  // 进程描述表初始化
+void proc_mapstacks(pagetable_t);

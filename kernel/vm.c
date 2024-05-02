@@ -8,6 +8,9 @@ pagetable_t kernel_pagetable;
 // 为什么类型是char[]
 extern char etext[];
 
+// 跳板代码的地址
+extern char trampoline[];
+
 // PTE是虚拟地址和物理地址的映射
 // 虚拟地址通过12-39 找到PTE
 // PTE记录当前页的物理地址 和权限
@@ -41,10 +44,11 @@ pagetable_t kvmmake(void) {
   kvmmap(kpgtbl, (uint64)etext, (uint64)etext, PHYMEMSTOP - (uint64)etext,
          PTE_R | PTE_W);
 
-  // kvmmap(kpgtbl, TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_R | PTE_X);
+  // trampoline在虚拟地址的最高层
+  kvmmap(kpgtbl, TRAMPOLINE, (uint64)trampoline, PGSIZE, PTE_R | PTE_X);
 
-  // // allocate and map a kernel stack for each process.
-  // proc_mapstacks(kpgtbl);
+  // 给每一个进程的内核栈分配虚拟内存 虚拟内存在trampoline下面
+  proc_mapstacks(kpgtbl);
 
   return kpgtbl;
 }
@@ -59,6 +63,12 @@ void kvminit(void) {
 // 开启分页
 // 硬件的页表寄存器存入内核页表
 void kvminithart() {
+  // 等待在此之前的内存读写操作完成 因为马上要改变仿存方式了
+  // 特权指令集P65
+  sfence_vma();
+  // 写satp寄存器
+  w_satp(MAKE_SATP(kernel_pagetable));
+  sfence_vma();
   /**
    * 但如果修改了 satp
    * 寄存器，说明内核切换到了一个与先前映射方式完全不同的页表。
@@ -70,11 +80,7 @@ void kvminithart() {
    * 这样 sfence.vma 只会刷新TLB中关于这个虚拟地址的单个映射项。
    * 特权指令集P65
    */
-  sfence_vma();
-  // 写satp寄存器
-  w_satp(MAKE_SATP(kernel_pagetable));
-  sfence_vma();
-  printf("memory paging init: \t\t done!\n ");
+  printf("memory paging init: \t\t done!\n");
 };
 
 // 内核 建立物理地址和虚拟地址的映射 并且设置当前虚拟地址的权限

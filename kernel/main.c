@@ -9,9 +9,12 @@ int main() {
     consoleinit();  // 初始化控制台
     printfinit();   // 初始化printf
     printf("paddle-os kernel is booting......\n");
+    printf("console init:\t\t\t done!\n");
+    printf("printf init:\t\t\t done!\n");
     kinit();        // 物理内存页分配初始化
     kvminit();      // 内核的页表初始化
     kvminithart();  // 开启内核页表
+    procinit();     // 进程描述表初始化
     asm volatile("wfi");
   } else {
     while (1) {

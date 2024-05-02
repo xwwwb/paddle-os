@@ -2,8 +2,9 @@
 #include "types.h"
 #include "riscv.h"
 #include "defs.h"
-#include "proc.h"
+
 #include "spinlock.h"
+#include "proc.h"
 
 // 标记内核是否崩溃
 volatile int panicked = 0;

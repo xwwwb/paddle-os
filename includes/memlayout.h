@@ -19,3 +19,10 @@
 #define PLIC_SPRIORITY(hart) (PLIC + 0x201000 + (hart) * 0x2000)
 #define PLIC_MCLAIM(hart) (PLIC + 0x200004 + (hart) * 0x2000)
 #define PLIC_SCLAIM(hart) (PLIC + 0x201004 + (hart) * 0x2000)
+
+// 让跳板代码在虚拟地址的最高层
+#define TRAMPOLINE (MAXVA - PGSIZE)
+
+// 根据进程的索引映射出进程的内核栈
+// 每一个内核栈分两页 一页有效 一页是无效的guard page 当栈溢出时 不会覆盖其他栈
+#define KSTACK(p) (TRAMPOLINE - ((p) + 1) * 2 * PGSIZE)

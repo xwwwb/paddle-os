@@ -4,7 +4,9 @@ K=kernel
 U=user
 
 # 汇编文件
-SRCS_ASM = $K/entry.S
+SRCS_ASM = \
+	$K/entry.S \
+	$K/trampoline.S
 # C 语言文件
 SRCS_C = \
 	$K/main.c \
