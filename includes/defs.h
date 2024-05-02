@@ -24,6 +24,7 @@ void uartputc_sync(int);  // 同步输出单字符
 void printfinit(void);                         // 初始化printf
 void printf(char *, ...);                      // 输出到控制台
 void panic(char *) __attribute__((noreturn));  // 报错
+void bootinfo();                               // 打印启动信息
 
 // kalloc.c
 void kinit(void);  // 物理内存页分配初始化
@@ -43,3 +44,7 @@ void kvminithart(void);                                  // 开启页表
 // proc.c
 void procinit(void);  // 进程描述表初始化
 void proc_mapstacks(pagetable_t);
+
+// trap.c
+void trapinit(void);      // 初始化陷入
+void trapinithart(void);  // 初始化陷入处理函数

@@ -54,7 +54,7 @@ void procinit() {
     p->kstack = KSTACK((int)(p - proc));
   }
 
-  printf("pagetable init:\t\t\t done!\n");
+  printf("proccess table init:\t\t done!\n");
 }
 
 // start.c 将hartid存入了tp

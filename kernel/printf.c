@@ -155,3 +155,9 @@ void printfinit(void) {
   initlock(&pr.lock, "printf");
   pr.locking = 1;
 }
+
+void bootinfo() {
+  printf("paddle-os kernel is booting......\n");
+  printf("console init:\t\t\t done!\n");
+  printf("printf init:\t\t\t done!\n");
+}

@@ -6,7 +6,8 @@ U=user
 # 汇编文件
 SRCS_ASM = \
 	$K/entry.S \
-	$K/trampoline.S
+	$K/trampoline.S \
+	$K/kernelvec.S \
 # C 语言文件
 SRCS_C = \
 	$K/main.c \
@@ -20,7 +21,8 @@ SRCS_C = \
 	$K/printf.c \
 	$K/kalloc.c \
 	$K/string.c \
-	$K/vm.c
+	$K/vm.c \
+	$K/trap.c
 
 
 

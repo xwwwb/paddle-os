@@ -15,6 +15,7 @@ static inline uint64 r_tp() {
   return x;
 }
 
+// 写tp寄存器
 static inline void w_tp(uint64 x) { asm volatile("mv tp, %0" : : "r"(x)); }
 
 // mstatus的位
@@ -34,9 +35,54 @@ static inline void w_mstatus(uint64 x) {
   asm volatile("csrw mstatus, %0" : : "r"(x));
 }
 
+// S 模式下陷入发生的原因
+static inline uint64 r_scause() {
+  uint64 x;
+  asm volatile("csrr %0, scause" : "=r"(x));
+  return x;
+}
+
+// S 模式下 异常原因
+static inline uint64 r_stval() {
+  uint64 x;
+  asm volatile("csrr %0, stval" : "=r"(x));
+  return x;
+}
+
+// S 模式下的中断 pending寄存器
+// 主动写入可以制造软中断
+static inline uint64 r_sip() {
+  uint64 x;
+  asm volatile("csrr %0, sip" : "=r"(x));
+  return x;
+}
+
+static inline void w_sip(uint64 x) { asm volatile("csrw sip, %0" : : "r"(x)); }
+
+// M模式 中断使能寄存器MIE
+#define MIE_MEIE (1L << 11)  // external
+#define MIE_MTIE (1L << 7)   // timer
+#define MIE_MSIE (1L << 3)   // software
+static inline uint64 r_mie() {
+  uint64 x;
+  asm volatile("csrr %0, mie" : "=r"(x));
+  return x;
+}
+
+static inline void w_mie(uint64 x) { asm volatile("csrw mie, %0" : : "r"(x)); }
+
 // 执行mret的时候会跳转到mepc寄存器的值
 static inline void w_mepc(uint64 x) {
   asm volatile("csrw mepc, %0" : : "r"(x));
+}
+
+// 写入m模式的scratch寄存器
+static inline void w_mscratch(uint64 x) {
+  asm volatile("csrw mscratch, %0" : : "r"(x));
+}
+// M 模式的陷入控制函数
+static inline void w_mtvec(uint64 x) {
+  asm volatile("csrw mtvec, %0" : : "r"(x));
 }
 
 // sie寄存器是S模式下的中断使能寄存器
@@ -87,6 +133,7 @@ static inline void w_pmpaddr0(uint64 x) {
   asm volatile("csrw pmpaddr0, %0" : : "r"(x));
 }
 
+#define SSTATUS_SPP (1L << 8)  // 陷入发生时 存发生时的模式 1是S 0是U
 #define SSTATUS_SIE (1L << 1)  // S模式下的中断使能位
 
 // 拿s状态的sstatus寄存器
@@ -98,6 +145,22 @@ static inline uint64 r_sstatus() {
 // 写s状态的sstatus寄存器
 static inline void w_sstatus(uint64 x) {
   asm volatile("csrw sstatus, %0" : : "r"(x));
+}
+
+// 写s模式的陷入处理寄存器
+static inline void w_stvec(uint64 x) {
+  asm volatile("csrw stvec, %0" : : "r"(x));
+}
+
+// 读写sepc 记录了陷入发生时的指针
+static inline void w_sepc(uint64 x) {
+  asm volatile("csrw sepc, %0" : : "r"(x));
+}
+
+static inline uint64 r_sepc() {
+  uint64 x;
+  asm volatile("csrr %0, sepc" : "=r"(x));
+  return x;
 }
 
 // 关中断
@@ -152,7 +215,7 @@ typedef uint64 *pagetable_t;
 #define PTE_X (1L << 3)  // 可执行
 
 // 最大的虚拟地址数量
-// 只管理256G 
+// 只管理256G
 #define MAXVA (1L << (9 + 9 + 9 + 12 - 1))
 
 #define PXMASK 0x1ff  // 9个比特
