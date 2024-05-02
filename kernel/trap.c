@@ -2,6 +2,7 @@
 #include "riscv.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "memlayout.h"
 #include "defs.h"
 
 struct spinlock tickslock;
@@ -77,20 +78,20 @@ int devintr() {
   // 最高位是1 且原因是9的情况下 是S模式的外部中断 比如 PLIC产生的
   if ((scause & 0x8000000000000000L) && (scause & 0xff) == 9) {
     // PLIC 处理
-    // int irq = plic_claim();
+    int irq = plic_claim();
 
-    // if (irq == UART0_IRQ) {
-    //   uartintr();
-    // } else if (irq == VIRTIO0_IRQ) {
-    //   virtio_disk_intr();
-    // } else if (irq) {
-    //   printf("unexpected interrupt irq=%d\n", irq);
-    // }
+    if (irq == UART0_IRQ) {
+      uartintr();
+    } else if (irq == VIRTIO0_IRQ) {
+      // virtio_disk_intr();
+    } else if (irq) {
+      printf("unexpected interrupt irq=%d\n", irq);
+    }
 
-    // // the PLIC allows each device to raise at most one
-    // // interrupt at a time; tell the PLIC the device is
-    // // now allowed to interrupt again.
-    // if (irq) plic_complete(irq);
+    // 通知PLIC处理完了 要不然下一次中断不会进来
+    if (irq) {
+      plic_complete(irq);
+    }
 
     return 1;
   } else if (scause & 0x8000000000000001L) {

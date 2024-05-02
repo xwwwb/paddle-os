@@ -80,33 +80,34 @@ kernelvec:
     addi sp, sp , 256
 
     sret
-    .global timervec
-    .align 4
-    timervec:
-        # 从msratch拿到时钟配置信息
-        csrrw a0, mscratch, a0
-        # 因为要用到a1 a2 a3三个寄存器 将他们存入时钟配置的前三位
-        sd a1, 0(a0)
-        sd a2, 8(a0)
-        sd a3, 16(a0)
+.global timervec
+.align 4
+timervec:
+    # 从msratch拿到时钟配置信息
+    csrrw a0, mscratch, a0
+    # 因为要用到a1 a2 a3三个寄存器 将他们存入时钟配置的前三位
+    sd a1, 0(a0)
+    sd a2, 8(a0)
+    sd a3, 16(a0)
 
-        # 定时器重置mtimecmp寄存器
-        ld a1, 24(a0) # mtimecmp内存地址
-        ld a2, 32(a0) # 周期
-        ld a3, 0(a1) # 因为a1存的是地址 不能对地址进行加减 要用这条语句仿存
+    # 定时器重置mtimecmp寄存器
+    ld a1, 24(a0) # mtimecmp内存地址
+    ld a2, 32(a0) # 周期
+    ld a3, 0(a1) # 因为a1存的是地址 不能对地址进行加减 要用这条语句仿存
 
-        # mtimecmp = mtimecmp + intervel
-        add a3, a3, a2
-        sd a3, 0(a1) # 写回mtimecmp的内存
+    # mtimecmp = mtimecmp + intervel
+    add a3, a3, a2
+    sd a3, 0(a1) # 写回mtimecmp的内存
 
-        # 触发软中断 让s模式处理时钟中断
-        li a1, 2
-        csrw sip, a1
-        
-        # 恢复现场
-        ld a3, 16(a0)
-        ld a2, 8(a0)
-        ld a1, 0(a0)
-        csrrw a0, mscratch, a0
+    # 触发软中断 让s模式处理时钟中断
+    li a1, 2
+    # sip寄存器的第一位是SSIP 写入1可以触发软中断也就是10
+    csrw sip, a1
+    
+    # 恢复现场
+    ld a3, 16(a0)
+    ld a2, 8(a0)
+    ld a1, 0(a0)
+    csrrw a0, mscratch, a0
 
-        mret
+    mret

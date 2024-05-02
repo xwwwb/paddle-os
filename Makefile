@@ -22,7 +22,8 @@ SRCS_C = \
 	$K/kalloc.c \
 	$K/string.c \
 	$K/vm.c \
-	$K/trap.c
+	$K/trap.c \
+	$K/plic.c
 
 
 

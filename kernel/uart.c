@@ -19,9 +19,17 @@ struct uart_16550a_regs {
 
 #define LCR_BAUD_LATCH (1 << 7)  // 修改波特率的模式
 #define LCR_EIGHT_BITS (3 << 0)  // 修改字长是8 没有校验
-#define LSR_TX_IDLE (1 << 5)     // THR可以接受其他字符了
 #define IER_RX_ENABLE (1 << 0)   // rx 使能
 #define IER_TX_ENABLE (1 << 1)   // tx 使能
+// LSR第五位1或者0
+// 1 transmitter hold register (or FIFO) is empty. CPU can load the next
+// character. 0 transmit holding register is full. 16550 will not accept any
+// data for transmission.
+#define LSR_TX_IDLE (1 << 5)
+// LSR第一位0或者1
+// 0 = no data in receive holding register or FIFO.
+// 1 = data has been receive and saved in the receive holding register or FIFO.
+#define LSR_RX_IDLE (1 << 0)
 
 #define FCR_FIFO_ENABLE (1 << 0)
 #define FCR_FIFO_CLEAR (3 << 1)
@@ -74,4 +82,31 @@ void uartputc_sync(int c) {
 
   // 开中断
   pop_off();
+}
+
+// 从uart读字符
+// 返回-2说明没有东西
+int uartgetc(void) {
+  if (regs->LSR & LSR_RX_IDLE) {
+    return regs->RBR_THR_DLL;
+  } else {
+    return -1;
+  }
+}
+
+// uart中断处理函数
+// 从devintr()函数来
+void uartintr(void) {
+  while (1) {
+    int c = uartgetc();
+    if (c == -1) {
+      break;
+    }
+    // consoleintr(c);
+    uartputc_sync(c);
+  }
+
+  acquire(&uart_tx_lock);
+  // uartstart();
+  release(&uart_tx_lock);
 }

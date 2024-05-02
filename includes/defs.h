@@ -18,6 +18,7 @@ void pop_off(void);                        // 开中断
 
 // uart.c
 void uartinit(void);      // 初始化uart设备
+void uartintr(void);      // uart中断处理
 void uartputc_sync(int);  // 同步输出单字符
 
 // printf.c
@@ -48,3 +49,9 @@ void proc_mapstacks(pagetable_t);
 // trap.c
 void trapinit(void);      // 初始化陷入
 void trapinithart(void);  // 初始化陷入处理函数
+
+// plic.c
+void plicinit(void);      // 初始化uart和虚拟io的优先级
+void plicinithart(void);  // 让PLIC开始接受设备中断
+int plic_claim(void);
+void plic_complete(int);

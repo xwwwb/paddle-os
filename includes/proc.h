@@ -1,7 +1,8 @@
 // CPU结构体
 struct cpu {
-  int noff;    // 记录关中断的层级
-  int intena;  // 记录关中断前 中断的状态
+  struct proc *proc;  // 运行在该CPU上的进程
+  int noff;           // 记录关中断的层级
+  int intena;         // 记录关中断前 中断的状态
 };
 
 enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };

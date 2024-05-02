@@ -62,7 +62,7 @@ void timerinit() {
   int id = r_mhartid();
 
   // 设置周期时间 在qemu上 周期大概是 1/10th秒
-  int intervel = 100000000;
+  int intervel = 1000000;
   *(uint64 *)CLINT_MTIMECMP(id) = *(uint64 *)CLINT_MTIME + intervel;
 
   // 修改scratch的内容 scratch可以看作是 定时器配置

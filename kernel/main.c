@@ -15,6 +15,9 @@ int main() {
     procinit();      // 进程描述表初始化
     trapinit();      // 初始化陷入
     trapinithart();  // 初始化陷入处理函数
+    plicinit();      // 设置uart和虚拟io的plic优先级
+    plicinithart();  // 让PLIC等待设备中断
+    intr_on();
     // asm volatile("wfi");
     while (1)
       ;
