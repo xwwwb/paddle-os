@@ -19,6 +19,8 @@ struct spinlock pid_lock;
 // 保护wait队列的线程安全
 struct spinlock wait_lock;
 
+// 预先给所有进程分配虚拟地址
+// 主要分配两个页的内核栈
 void proc_mapstacks(pagetable_t kpgtbl) {
   struct proc* p;
 

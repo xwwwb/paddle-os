@@ -23,7 +23,10 @@ SRCS_C = \
 	$K/string.c \
 	$K/vm.c \
 	$K/trap.c \
-	$K/plic.c
+ 	$K/plic.c \
+	$K/bio.c \
+	$K/sleeplock.c \
+	$K/fs.c
 
 
 

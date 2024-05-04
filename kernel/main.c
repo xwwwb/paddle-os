@@ -17,6 +17,9 @@ int main() {
     trapinithart();  // 初始化陷入处理函数
     plicinit();      // 设置uart和虚拟io的plic优先级
     plicinithart();  // 让PLIC等待设备中断
+    binit();         // 初始化IO缓存双向循环链表
+    iinit();         // inode 初始化
+    fileinit();      // 初始化文件表
     intr_on();
     // asm volatile("wfi");
     while (1)

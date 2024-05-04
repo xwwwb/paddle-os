@@ -213,6 +213,7 @@ typedef uint64 *pagetable_t;
 #define PTE_R (1L << 1)  // 可读
 #define PTE_W (1L << 2)  // 可写
 #define PTE_X (1L << 3)  // 可执行
+#define PTE_U (1L << 4)  // 用户态可访问
 
 // 最大的虚拟地址数量
 // 只管理256G
@@ -231,3 +232,6 @@ typedef uint64 *pagetable_t;
 #define PTE2PA(pte) (((pte) >> 10) << 12)
 // 物理地址转PTE中的号码 右移12是为了得到页号 左移10位是腾出flag位
 #define PA2PTE(pa) (((((uint64)pa)) >> 12) << 10)
+
+// 取前9位
+#define PTE_FLAGS(pte) ((pte) & 0x3FF)

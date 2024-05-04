@@ -94,7 +94,7 @@ int uartgetc(void) {
   }
 }
 
-// uart中断处理函数
+// uart中断处理函数 有字符输入或者准备输出时被调用
 // 从devintr()函数来
 void uartintr(void) {
   while (1) {
@@ -103,10 +103,11 @@ void uartintr(void) {
       break;
     }
     // consoleintr(c);
-    uartputc_sync(c);
   }
 
+  // 发送缓存的字符
   acquire(&uart_tx_lock);
+  // 好像是用户发送字符到控制台也会触发中断 这个uartstart是给发送字符准备的
   // uartstart();
   release(&uart_tx_lock);
 }

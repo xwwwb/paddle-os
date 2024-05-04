@@ -2,10 +2,10 @@
 #include "types.h"
 #include "riscv.h"
 #include "defs.h"
-#include "file.h"
-
 #include "spinlock.h"
+#include "sleeplock.h"
 #include "proc.h"
+#include "file.h"
 
 // 退格键
 #define BACKSPACE 0x100

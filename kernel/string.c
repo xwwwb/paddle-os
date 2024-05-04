@@ -11,3 +11,30 @@ void *memset(void *dst, int c, uint n) {
   }
   return dst;
 }
+
+// 内存拷贝
+// 目标 原地址 大小
+void *memmove(void *dst, const void *src, uint n) {
+  const char *s;
+  char *d;
+  if (n == 0) {
+    return dst;
+  }
+  s = src;
+  d = dst;
+  if (s < d && s + n > d) {
+    // 原地址小于目标地址 且内存重叠
+    // 从后向前复制
+    s += n;
+    d += n;
+    while (n-- > 0) {
+      *--d = *--s;
+    }
+  } else {
+    // 无重叠
+    while (n-- > 0) {
+      *d++ = *s++;
+    }
+  }
+  return dst;
+}
