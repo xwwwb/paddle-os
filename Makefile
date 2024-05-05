@@ -8,6 +8,7 @@ SRCS_ASM = \
 	$K/entry.S \
 	$K/trampoline.S \
 	$K/kernelvec.S \
+	$K/swtch.S
 # C 语言文件
 SRCS_C = \
 	$K/main.c \

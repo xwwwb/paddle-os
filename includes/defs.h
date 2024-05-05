@@ -1,6 +1,7 @@
 struct spinlock;
 struct sleeplock;
-
+struct proc;
+struct context;
 // proc.c
 int cpuid(void);
 struct cpu *mycpu(void);
@@ -36,6 +37,7 @@ void *kalloc();  // 分配一个页的物理内存
 // string.c
 void *memset(void *, int, uint);            // 内存赋值
 void *memmove(void *, const void *, uint);  // 内存拷贝
+char *safestrcpy(char *, const char *, int);  // 安全的字符串拷贝 确保以0结尾
 
 // vm.c
 void kvminit(void);  // 内核虚拟内存初始化
@@ -57,12 +59,35 @@ int copyin(pagetable_t, char *, uint64, uint64);  // 用户态拷贝到内核态
 int copyinstr(pagetable_t, char *, uint64, uint64);  // 用户态拷贝到内核态
 
 // proc.c
-void procinit(void);  // 进程描述表初始化
-void proc_mapstacks(pagetable_t);
+int cpuid(void);  // 返回CPU hart id
+void exit(int);
+int fork(void);
+int growproc(int);                          // 进程的内存扩大或者缩小
+void proc_mapstacks(pagetable_t);           // 映射进程内核栈
+pagetable_t proc_pagetable(struct proc *);  // 创建进程页表
+void proc_freepagetable(pagetable_t, uint64);  // 清除进程页表
+int kill(int);
+int killed(struct proc *);
+void setkilled(struct proc *);
+struct cpu *mycpu(void);  // 返回CPU的id
+struct cpu *getmycpu(void);
+struct proc *myproc();                           // 返回进程描述结构
+void procinit(void);                             // 初始化进程表
+void scheduler(void) __attribute__((noreturn));  // 选择下一个运行的进程
+void sched(void);                                // 调度进入scheduler
+void sleep(void *, struct spinlock *);
+void userinit(void);  // 第一个用户进程的初始化
+int wait(uint64);
+void wakeup(void *);
+void yield(void);  // 放弃CPU 进入下一个任务
+int either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
+int either_copyin(void *dst, int user_src, uint64 src, uint64 len);
+void procdump(void);
 
 // trap.c
 void trapinit(void);      // 初始化陷入
 void trapinithart(void);  // 初始化陷入处理函数
+void usertrapret(void);   // 返回用户态
 
 // plic.c
 void plicinit(void);      // 初始化uart和虚拟io的优先级
@@ -81,3 +106,6 @@ void iinit(void);  // 初始化inode表
 
 // file.c
 void fileinit(void);
+
+// swtch.S
+void swtch(struct context *, struct context *);  // 内核进程上下文切换

@@ -120,6 +120,12 @@ static inline void w_medeleg(uint64 x) {
 }
 
 // stap寄存器是页表基址寄存器
+static inline uint64 r_satp() {
+  uint64 x;
+  asm volatile("csrr %0, satp" : "=r"(x));
+  return x;
+}
+
 static inline void w_satp(uint64 x) {
   asm volatile("csrw satp, %0" : : "r"(x));
 }
@@ -134,7 +140,8 @@ static inline void w_pmpaddr0(uint64 x) {
 }
 
 #define SSTATUS_SPP (1L << 8)  // 陷入发生时 存发生时的模式 1是S 0是U
-#define SSTATUS_SIE (1L << 1)  // S模式下的中断使能位
+#define SSTATUS_SIE (1L << 1)   // S模式下的中断使能位
+#define SSTATUS_SPIE (1L << 5)  // 进入陷入时 SIE的值
 
 // 拿s状态的sstatus寄存器
 static inline uint64 r_sstatus() {

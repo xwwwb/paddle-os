@@ -33,8 +33,11 @@
 #define CLINT_MTIMECMP(hartid) (CLINT_BASE + 0x4000 + 8 * (hartid))
 #define CLINT_MTIME (CLINT_BASE + 0xBFF8)  // 启动后按照一定频率增加
 
-// 让跳板代码在虚拟地址的最高层
+// 让跳板代码在虚拟地址的最高层 无论是用户页表还是内核页表都是
 #define TRAMPOLINE (MAXVA - PGSIZE)
+
+// 在用户页表中 trapframe在trampoline下面
+#define TRAPFRAME (TRAMPOLINE - PGSIZE)
 
 // 根据进程的索引映射出进程的内核栈
 // 每一个内核栈分两页 一页有效 一页是无效的guard page 当栈溢出时 不会覆盖其他栈

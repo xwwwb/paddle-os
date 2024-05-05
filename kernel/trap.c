@@ -8,6 +8,9 @@
 struct spinlock tickslock;
 uint ticks;
 
+// 这三个符号在trampoline.S中
+extern char trampoline[], uservec[], userret[];
+
 // 定义在kernelvec.S 中 会调用kerneltrap
 void kernelvec();
 
@@ -54,10 +57,10 @@ void kerneltrap() {
     panic("kerneltrap");
   }
 
-  // // give up the CPU if this is a timer interrupt.
-  // if (which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING) {
-  //   yield();
-  // }
+  // 如果是内核进程发生中断了 myproc()为0
+  if (which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING) {
+    yield();
+  }
 
   w_sepc(sepc);
   w_sstatus(sstatus);
@@ -69,6 +72,96 @@ void clockintr() {
   ticks++;
   // wakeup(&ticks);
   release(&tickslock);
+}
+
+// 从trampoline.S 进来 处理系统调用 异常和中断
+// trampoline.S已经保存了用户态的寄存器
+void usertrap(void) {
+  int which_dev = 0;
+
+  if ((r_sstatus() & SSTATUS_SPP) != 0) {
+    // 不是用户来的异常或中断却进入了这里
+    panic("usertrap: not from user mode");
+  }
+
+  // 陷入后 由内核陷入处理函数处理陷入
+  w_stvec((uint64)kernelvec);
+
+  struct proc *p = myproc();
+
+  // 保存陷入发生时用户态的程序计数器
+  p->trapframe->epc = r_sepc();
+
+  // if (r_scause() == 8) {
+  //   // system call
+
+  //   if (killed(p)) exit(-1);
+
+  //   // sepc points to the ecall instruction,
+  //   // but we want to return to the next instruction.
+  //   p->trapframe->epc += 4;
+
+  //   // an interrupt will change sepc, scause, and sstatus,
+  //   // so enable only now that we're done with those registers.
+  //   intr_on();
+
+  //   syscall();
+  // } else if ((which_dev = devintr()) != 0) {
+  //   // ok
+  // } else {
+  //   printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
+  //   printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+  //   setkilled(p);
+  // }
+
+  // if (killed(p)) exit(-1);
+
+  // 放弃CPU 任务调度
+  if (which_dev == 2) {
+    yield();
+  }
+
+  // 返回用户态
+  usertrapret();
+}
+
+// 返回用户态
+void usertrapret(void) {
+  struct proc *p = myproc();
+
+  // 在切换陷入处理函数未完成的时候 暂时关掉中断
+  // 要切换回usertrap了
+  intr_off();
+
+  // 算出trampoline.S中uservec的地址 算式后面的减法是差值
+  // TRAMPOLINE是虚拟地址最高位 加上uservec的差值就是uservec的虚拟地址
+  uint64 trampoline_uservec = TRAMPOLINE + (uservec - trampoline);
+  // 设置中断处理函数为uservec
+  w_stvec(trampoline_uservec);
+
+  // 下次从内核态进入用户态的时候 也就是 uservec中
+  // 会用到这些
+  p->trapframe->kernel_satp = r_satp();          // 内核页表
+  p->trapframe->kernel_sp = p->kstack + PGSIZE;  // 内核栈
+  p->trapframe->kernel_trap = (uint64)usertrap;  // C语言编写的陷入处理函数
+  p->trapframe->kernel_hartid = r_tp();          // CPU hart id
+
+  // 设置SPP是0 下次sret会进入U模式
+  unsigned long x = r_sstatus();
+  x &= ~SSTATUS_SPP;  // 让SPP位为0 下次sret进入U模式
+  x |= SSTATUS_SPIE;  // 用户模式开启中断
+  w_sstatus(x);
+
+  // 进入陷入的时候 在usertrap存下了进入陷入时的计数器
+  // 这里恢复
+  w_sepc(p->trapframe->epc);
+
+  // 进程页表的计算 传入userret函数 在userret中写道satp中
+  uint64 satp = MAKE_SATP(p->pagetable);
+
+  // 计算userret的虚拟地址然后执行这个函数 传入的参数是satp
+  uint64 trampoline_userret = TRAMPOLINE + (userret - trampoline);
+  ((void (*)(uint64))trampoline_userret)(satp);
 }
 
 // 检测中断的发生是外部中断还是软中断

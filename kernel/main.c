@@ -20,12 +20,9 @@ int main() {
     binit();         // 初始化IO缓存双向循环链表
     iinit();         // inode 初始化
     fileinit();      // 初始化文件表
-    intr_on();
-    // asm volatile("wfi");
-    while (1)
-      ;
+    userinit();      // 初始化第一个程序 init
   } else {
-    while (1) {
-    }
   }
+
+  scheduler();
 }

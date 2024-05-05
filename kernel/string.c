@@ -38,3 +38,18 @@ void *memmove(void *dst, const void *src, uint n) {
   }
   return dst;
 }
+
+// 字符串拷贝
+// 这个函数的作用是将源字符串的前n-1个字符复制到目标字符串，
+// 并在末尾添加一个空字符。如果n小于等于0，函数不进行任何复制操作。
+char* safestrcpy(char *s, const char *t, int n) {
+  char *os;
+  os = s;
+  if (n <= 0) {
+    return os;
+  }
+  while (--n > 0 && (*s++ = *t++) != 0)
+    ;
+  *s = 0;
+  return os;
+}
