@@ -543,4 +543,91 @@ int wait(uint64 addr) {
   }
 }
 
-int killed(struct proc* p) {}
+// kill字段设为1
+void setkilled(struct proc* p) {
+  acquire(&p->lock);
+  p->killed = 1;
+  release(&p->lock);
+}
+
+// 返回kill字段
+int killed(struct proc* p) {
+  int k;
+
+  acquire(&p->lock);
+  k = p->killed;
+  release(&p->lock);
+  return k;
+}
+
+// 结束一个进程
+// 但是他不会立即杀死 会将状态设置为可运行的
+// 且killed字段设置为-1
+// 在下次trap的时候 遇见killed为1的
+// 直接exit(-1) 所有子进程转给init
+int kill(int pid) {
+  struct proc* p;
+
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if (p->pid == pid) {
+      p->killed = 1;
+      if (p->state == SLEEPING) {
+        // 如果进程是被睡眠的状态 改为可被执行的
+        // 等待调度的时候把他杀掉
+        p->state = RUNNABLE;
+      }
+      release(&p->lock);
+      return 0;
+    }
+    release(&p->lock);
+  }
+  return -1;
+}
+
+// 拷贝到user address或者kernel address 取决于user_dst user_dst应该可以看作bool
+int either_copyout(int user_dst, uint64 dst, void* src, uint64 len) {
+  struct proc* p = myproc();
+  if (user_dst) {
+    return copyout(p->pagetable, dst, src, len);
+  } else {
+    memmove((char*)dst, src, len);
+    return 0;
+  }
+}
+
+// 从user address或者kernel address 拷出 取决于user_dst user_dst应该可以看作bool
+int either_copyin(void* dst, int user_src, uint64 src, uint64 len) {
+  struct proc* p = myproc();
+  if (user_src) {
+    return copyin(p->pagetable, dst, src, len);
+  } else {
+    memmove(dst, (char*)src, len);
+    return 0;
+  }
+}
+
+// 打印当前进程列表 调试用
+// 当使用了 CTRL P时
+void procdump(void) {
+  static char* states[] = {
+      [UNUSED] "unused",   [USED] "used",      [SLEEPING] "sleep ",
+      [RUNNABLE] "runble", [RUNNING] "run   ", [ZOMBIE] "zombie"};
+
+  struct proc* p;
+  char* state;
+  printf("\n");
+  for (p = proc; p < &proc[NPROC]; p++) {
+    if (p->state == UNUSED) {
+      continue;
+    }
+    // 进程号是正数 且有效 且不超过进程状态列表长度
+    if (p->state >= 0 && p->state < NELEM(states) && states[p->state]) {
+      state = states[p->state];
+    } else {
+      state = "???";
+    }
+    printf("%d %s %s", p->pid, state, p->name);
+    printf("\n");
+  }
+}
