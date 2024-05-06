@@ -97,6 +97,9 @@ void plic_complete(int);  // 告诉PLIC中断完成了
 
 // sleeplock.c
 void initsleeplock(struct sleeplock *, char *);  // 初始化自旋锁
+void acquiresleep(struct sleeplock *);  // 获得睡眠锁 如果有竞态 就睡觉
+void releasesleep(struct sleeplock *);  // 释放睡眠锁 如果有人再等 就唤醒
+int holdingsleep(struct sleeplock *);  // 查询锁的持有状态
 
 // bio.c
 void binit(void);  // 初始化IO缓存双向循环链表

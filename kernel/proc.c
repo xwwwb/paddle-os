@@ -354,3 +354,43 @@ void forkret(void) {
   // 正常的系统调用或者时间片轮转 都会执行到这里
   usertrapret();
 }
+
+// 进程停止工作并且睡眠到chan上
+// 这里的进程一定是进程的内核进程
+// 而不是用户进程 或者说用户进程已经陷入之后才可以执行这里的sleep
+// 主要用于释放CPU 当wakeup的时候再回来
+void sleep(void* chan, struct spinlock* lk) {
+  // 因为要修改进程状态 所以一定要拿到p->lock
+  struct proc* p = myproc();
+  acquire(&p->lock);
+  release(lk);  // 释放调用sleep时传入的锁 防止外部的锁死锁
+
+  p->chan = chan;
+  p->state = SLEEPING;
+  // 内核进程走到这里就停止了
+  // 当wakeup的时候 应该是会走到sched的下面的代码
+  sched();
+
+  p->chan = 0;
+
+  // 睡眠前上的锁
+  release(&p->lock);
+  acquire(lk);
+}
+
+// 唤醒进程 主要目的是调整为RUNNABLE 可被调度
+void wakeup(void* chan) {
+  struct proc* p;
+
+  // 从头遍历进程表
+  for (p = proc; p < &proc[NPROC]; p++) {
+    if (p != myproc()) {
+      acquire(&p->lock);
+      if (p->state == SLEEPING && p->chan == chan) {
+        // 找到了chan相同且正在睡眠的进程
+        p->state = RUNNABLE;
+      }
+      release(&p->lock);
+    }
+  }
+}
