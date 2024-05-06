@@ -345,10 +345,10 @@ void forkret(void) {
   // 但是首次调度的程序走不到yield
   release(&myproc()->lock);
 
-  // if (first) {
-  //   first = 0;
-  //   fsinit(ROOTDEV);
-  // }
+  if (first) {
+    first = 0;
+    // fsinit(ROOTDEV);
+  }
 
   // 进入到用户陷入恢复程序 主要用于进入用户空间
   // 正常的系统调用或者时间片轮转 都会执行到这里
@@ -394,3 +394,153 @@ void wakeup(void* chan) {
     }
   }
 }
+
+// 创建一个新进程 拷贝父进程的内存数据
+// 设置新进程的内核栈 因为要从陷入恢复到用户栈
+int fork(void) {
+  int i, pid;
+  struct proc* np;  // 新进程
+  struct proc* p = myproc();
+
+  // 分配新进程
+  // 将分配内核栈和返回地址是forkret
+  if ((np = allocproc()) == 0) {
+    return -1;
+  }
+
+  // 传入两个页表 拷贝内存数据
+  if (uvmcopy(p->pagetable, np->pagetable, p->sz) < 0) {
+    freeproc(np);
+    // alloc的时候锁还是持有的
+    release(&np->lock);
+  }
+  np->sz = p->sz;
+  // 拷贝父进程的trapframe
+  // 恢复的时候子进程的寄存器和父进程一样
+  *(np->trapframe) = *(p->trapframe);
+
+  // 子进程返回0
+  np->trapframe->a0 = 0;
+
+  // 增加文件的引用数量
+  // increment reference counts on open file descriptors.
+  // for (i = 0; i < NOFILE; i++)
+  //   if (p->ofile[i]) np->ofile[i] = filedup(p->ofile[i]);
+  // np->cwd = idup(p->cwd);
+
+  safestrcpy(np->name, p->name, sizeof(p->name));
+  pid = np->pid;
+
+  // alloc的时候锁还是持有的
+  release(&np->lock);
+
+  acquire(&wait_lock);
+  np->parent = p;
+  release(&wait_lock);
+
+  // 修改进程状态
+  acquire(&np->lock);
+  np->state = RUNNABLE;
+  release(&np->lock);
+
+  return pid;
+}
+
+// 更换传入进程的所有子进程指向init进程
+void reparent(struct proc* p) {
+  struct proc* pp;
+
+  for (pp = proc; pp < &proc[NPROC]; pp++) {
+    if (pp->parent == p) {
+      pp->parent = initproc;
+      wakeup(initproc);
+    }
+  }
+}
+
+// 退出当前进程 不返回 设置为僵尸状态
+// 等待父进程的wait
+void exit(int status) {
+  struct proc* p = myproc();
+  if (p == initproc) {
+    // init进程不允许结束
+    panic("init exiting");
+  }
+
+  // 关闭打开的文件
+  //  for(int fd = 0; fd < NOFILE; fd++){
+  //   if(p->ofile[fd]){
+  //     struct file *f = p->ofile[fd];
+  //     fileclose(f);
+  //     p->ofile[fd] = 0;
+  //   }
+  // }
+  //  begin_op();
+  // iput(p->cwd);
+  // end_op();
+  // p->cwd = 0;
+
+  acquire(&wait_lock);
+
+  // 把他的所有子进程给init
+  reparent(p);
+
+  // 回到wait
+  // 父进程可能在睡眠
+  // 主要是让父进程变为RUNNABLE
+  wakeup(p->parent);
+
+  acquire(&p->lock);
+  p->xstate = status;  // 返回状态
+  p->state = ZOMBIE;   // 进程状态
+  release(&wait_lock);
+
+  // 参与调度 再也不会回来了
+  // 因为该进程不会变成RUNNABLE了
+  sched();
+  panic("zombie exit");
+}
+
+// wait是父进程等待子进程退出 没有子进程返回-1
+int wait(uint64 addr) {
+  struct proc* pp;
+  int havekids, pid;
+  struct proc* p = myproc();
+
+  acquire(&wait_lock);
+  for (;;) {
+    havekids = 0;
+    for (pp = proc; pp < &proc[NPROC]; pp++) {
+      if (pp->parent == p) {
+        // 保证子进程不在exit或者swtch中
+        acquire(&pp->lock);
+        havekids = 1;
+        if (pp->state == ZOMBIE) {
+          // 找到了需要退出的子程序
+          pid = pp->pid;
+          if (addr != 0 && copyout(p->pagetable, addr, (char*)&pp->xstate,
+                                   sizeof(pp->xstate)) < 0) {
+            release(&pp->lock);
+            release(&wait_lock);
+            return -1;
+          }
+          // 清除进程结构 包括将状态改成UNUSED
+          freeproc(pp);
+          release(&pp->lock);
+          release(&wait_lock);
+          return pid;
+        }
+        release(&pp->lock);
+      }
+    }
+    // 没有找到子或者当前的进程已经是被关掉的
+    if (!havekids || killed(p)) {
+      release(&wait_lock);
+      return -1;
+    }
+    // 将进程自己作为chan 等待被exit唤醒
+    sleep(p, &wait_lock);
+  }
+}
+
+int killed(struct proc* p) {}

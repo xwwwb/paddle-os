@@ -2,9 +2,6 @@ struct spinlock;
 struct sleeplock;
 struct proc;
 struct context;
-// proc.c
-int cpuid(void);
-struct cpu *mycpu(void);
 
 // console.c
 void consoleinit();
@@ -59,9 +56,9 @@ int copyin(pagetable_t, char *, uint64, uint64);  // 用户态拷贝到内核态
 int copyinstr(pagetable_t, char *, uint64, uint64);  // 用户态拷贝到内核态
 
 // proc.c
-int cpuid(void);  // 返回CPU hart id
-void exit(int);
-int fork(void);
+int cpuid(void);                            // 返回CPU hart id
+void exit(int);                             // 进程的退出
+int fork(void);                             // 创建新进程
 int growproc(int);                          // 进程的内存扩大或者缩小
 void proc_mapstacks(pagetable_t);           // 映射进程内核栈
 pagetable_t proc_pagetable(struct proc *);  // 创建进程页表
@@ -69,17 +66,16 @@ void proc_freepagetable(pagetable_t, uint64);  // 清除进程页表
 int kill(int);
 int killed(struct proc *);
 void setkilled(struct proc *);
-struct cpu *mycpu(void);  // 返回CPU的id
-struct cpu *getmycpu(void);
+struct cpu *mycpu(void);                         // 返回CPU的id
 struct proc *myproc();                           // 返回进程描述结构
 void procinit(void);                             // 初始化进程表
 void scheduler(void) __attribute__((noreturn));  // 选择下一个运行的进程
 void sched(void);                                // 调度进入scheduler
-void sleep(void *, struct spinlock *);
-void userinit(void);  // 第一个用户进程的初始化
-int wait(uint64);
-void wakeup(void *);
-void yield(void);  // 放弃CPU 进入下一个任务
+void sleep(void *, struct spinlock *);  // 进程睡眠 放弃CPU 睡在第一个参数chan上
+void userinit(void);                    // 第一个用户进程的初始化
+int wait(uint64);     // 父进程运行这个等待子进程的死亡
+void wakeup(void *);  // 唤醒睡眠的进程 回到执行睡眠锁的位置
+void yield(void);     // 放弃CPU 进入下一个任务
 int either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
 int either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void procdump(void);

@@ -42,6 +42,10 @@ OBJS += ${SRCS_C:.c=.o}
 all: ${OBJS}
 	@${CC} ${CFLAGS} -T $K/kernel.ld -o kernel.elf $^
 
+# 生成汇编
+code : ${OBJS}
+	@${OBJDUMP} -S ${OBJS} | less
+
 # 启动
 run: all
 	@${QEMU} ${QFLAGS} -kernel kernel.elf
