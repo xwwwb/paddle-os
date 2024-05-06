@@ -80,7 +80,9 @@ void kvminithart() {
    * 这样 sfence.vma 只会刷新TLB中关于这个虚拟地址的单个映射项。
    * 特权指令集P65
    */
-  printf("memory paging init: \t\t done!\n");
+  if (cpuid() == 0) {
+    printf("memory paging init: \t\t done!\n");
+  }
 };
 
 // 内核 建立物理地址和虚拟地址的映射 并且设置当前虚拟地址的权限

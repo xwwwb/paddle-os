@@ -20,7 +20,9 @@ void plicinithart() {
   // hart端阈值为0
   *(uint32 *)PLIC_SPRIORITY(hart) = 0;
 
-  printf("uart & virtio irq init:\t\t done!\n");
+  if (cpuid() == 0) {
+    printf("uart & virtio irq init:\t\t done!\n");
+  }
 }
 
 // 询问中断设备是谁

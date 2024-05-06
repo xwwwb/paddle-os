@@ -3,6 +3,9 @@
 #include "riscv.h"
 #include "defs.h"
 
+// 标记0号CPU的启动状态
+volatile static int started = 0;
+
 int main() {
   // 初始化第一个CPU
   if (cpuid() == 0) {
@@ -21,8 +24,20 @@ int main() {
     iinit();         // inode 初始化
     fileinit();      // 初始化文件表
     userinit();      // 初始化第一个程序 init
-  } else {
-  }
 
+    printf("hart %d starting\n", cpuid());
+    // 一定程度保证了原子化
+    __sync_synchronize();
+    started = 1;
+  } else {
+    while (started == 0)
+      ;
+    __sync_synchronize();
+    kvminithart();   // 开启内核页表
+    trapinithart();  // 初始化陷入处理函数
+    plicinithart();  // 让PLIC等待设备中断
+    printf("hart %d starting\n", cpuid());
+  }
+  // 开启进程调度
   scheduler();
 }

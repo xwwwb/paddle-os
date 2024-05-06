@@ -17,4 +17,5 @@ struct devsw devsw[NDEV];
 void fileinit(void) {
   // 文件表
   initlock(&ftable.lock, "ftable");
+  printf("file table init:\t\t done!\n");
 }

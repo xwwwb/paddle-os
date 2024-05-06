@@ -27,7 +27,10 @@ void trapinit(void) {
 void trapinithart() {
   // 写入陷入处理函数
   w_stvec((uint64)kernelvec);
-  printf("trap vector init:\t\t done!\n");
+
+  if (cpuid() == 0) {
+    printf("trap vector init:\t\t done!\n");
+  }
 }
 
 // 陷入处理函数 kernelvec会调用这边
