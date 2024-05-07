@@ -11,6 +11,11 @@
         "stdarg.h": "c",
         "params.h": "c",
         "proc.h": "c",
-        "sleeplock.h": "c"
+        "sleeplock.h": "c",
+        "fs.h": "c",
+        "stdio.h": "c",
+        "fcntl.h": "c",
+        "unistd.h": "c",
+        "stat.h": "c"
     }
 }

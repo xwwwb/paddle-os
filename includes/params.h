@@ -8,9 +8,16 @@
 #define NPROC 64
 
 #define MAXOPBLOCKS 10
+
 #define LOGSIZE (MAXOPBLOCKS * 3)
+
 #define NBUF (MAXOPBLOCKS * 3)
 
-#define NINODE 50  // 最大的活跃的inode数量
+// 最大的活跃的inode数量 加载到内存中的Inode数
+#define NINODE 50
 
-#define NFILE 100  // 系统最多可以打开文件数
+// 系统最多可以打开文件数
+#define NFILE 100
+
+// 文件系统可以管理的块数 也就是2000kb的大小的磁盘
+#define FSSIZE 2000

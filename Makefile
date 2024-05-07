@@ -38,6 +38,12 @@ OBJS += ${SRCS_C:.c=.o}
 # 默认启动命令
 .DEFAULT_GOAL := all
 
+mkfs/mkfs: mkfs/mkfs.c
+	gcc -Werror -Wall -o mkfs/mkfs -I. mkfs/mkfs.c
+
+disk.img: mkfs/mkfs 
+	@mkfs/mkfs disk.img README.md
+
 # 生成目标文件
 all: ${OBJS}
 	@${CC} ${CFLAGS} -T $K/kernel.ld -o kernel.elf $^
@@ -47,7 +53,7 @@ code : ${OBJS}
 	@${OBJDUMP} -S ${OBJS} | less
 
 # 启动
-run: all
+run: all disk.img
 	@${QEMU} ${QFLAGS} -kernel kernel.elf
 
 # 调试
@@ -55,6 +61,7 @@ debug: all
 	${QEMU} ${QFLAGS} -kernel kernel.elf -s -S &
 	@${GDB} kernel.elf -q -x ./gdbinit
 
+# 供给vscode用
 qemu-debug: all
 	@echo "start qemu debug"
 	${QEMU} ${QFLAGS} -kernel kernel.elf -s -S
@@ -66,4 +73,4 @@ qemu-debug: all
 	${CC} ${CFLAGS} -c -o $@ $<
 
 clean:
-	rm -f ${OBJS} kernel.elf
+	rm -f ${OBJS} kernel.elf disk.img mkfs/mkfs
