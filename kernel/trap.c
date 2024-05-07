@@ -95,29 +95,34 @@ void usertrap(void) {
   // 保存陷入发生时用户态的程序计数器
   p->trapframe->epc = r_sepc();
 
-  // if (r_scause() == 8) {
-  //   // system call
+  if (r_scause() == 8) {
+    // 系统调用
+    // 如果当前进程是被标记为killed 就在此时处理
+    // printf("进程%s 系统调用了，调用号：%d\n", p->name, p->trapframe->a7);
+    if (killed(p)) {
+      exit(-1);
+    }
 
-  //   if (killed(p)) exit(-1);
+    // 系统调用需要让epc向下移动32位 否则会重复触发系统调用
+    p->trapframe->epc += 4;
 
-  //   // sepc points to the ecall instruction,
-  //   // but we want to return to the next instruction.
-  //   p->trapframe->epc += 4;
+    // // an interrupt will change sepc, scause, and sstatus,
+    // // so enable only now that we're done with those registers.
+    // intr_on();
 
-  //   // an interrupt will change sepc, scause, and sstatus,
-  //   // so enable only now that we're done with those registers.
-  //   intr_on();
+    // syscall();
+  } else if ((which_dev = devintr()) != 0) {
+    // ok
+  } else {
+    printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
+    printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+    setkilled(p);
+  }
 
-  //   syscall();
-  // } else if ((which_dev = devintr()) != 0) {
-  //   // ok
-  // } else {
-  //   printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
-  //   printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
-  //   setkilled(p);
-  // }
-
-  // if (killed(p)) exit(-1);
+  // 如果当前进程是被标记为killed 就在此时处理
+  if (killed(p)) {
+    exit(-1);
+  }
 
   // 放弃CPU 任务调度
   if (which_dev == 2) {
