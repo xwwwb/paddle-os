@@ -20,6 +20,10 @@ QEMU = /usr/local/bin/qemu-system-riscv64 # qemu 9.0
 CPUS := 8
 
 QFLAGS = -nographic -smp ${CPUS} -machine virt -bios none
+# QEMU 添加设备
+QFLAGS += -drive file=disk.img,if=none,format=raw,id=x0
+# QEMU 添加总线
+QFLAGS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
 GDB = gdb-multiarch
 CC = ${CROSS_COMPILE}gcc
