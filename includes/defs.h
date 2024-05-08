@@ -3,6 +3,14 @@ struct sleeplock;
 struct proc;
 struct context;
 
+// bio.c
+void binit(void);               // 初始化buffer链表
+struct buf *bread(uint, uint);  // 给块号 返回带数据的buf
+void brelse(struct buf *);      // 释放当前buf的锁
+void bwrite(struct buf *);      // 向buf写
+void bpin(struct buf *);        // 增加进程对buf的引用
+void bunpin(struct buf *);      // 减少进程对buf的引用
+
 // console.c
 void consoleinit();  // 初始化控制台设备
 void consputc(int);  // 放置一个字符到控制台 只允许kernel使用
@@ -110,6 +118,11 @@ void fileinit(void);
 
 // swtch.S 🎉
 void swtch(struct context *, struct context *);  // 内核进程上下文切换
+
+// virtio_disk.c
+void virtio_disk_init(void);
+void virtio_disk_rw(struct buf *, int);
+void virtio_disk_intr(void);
 
 // 固定大小的数组 返回元素数
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))

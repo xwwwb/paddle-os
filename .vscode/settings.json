@@ -16,6 +16,7 @@
         "stdio.h": "c",
         "fcntl.h": "c",
         "unistd.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "buf.h": "c"
     }
 }
