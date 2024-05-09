@@ -433,7 +433,6 @@ int readi(struct inode *ip, int user_dst, uint64 dst, uint off, uint n) {
 }
 
 // 写数据到inode
-// Caller must hold ip->lock.
 // 调用者必须由inode的锁 如果user_dst为1 说明dst是user vm
 // 返回写入数
 int writei(struct inode *ip, int user_src, uint64 src, uint off, uint n) {
@@ -483,3 +482,69 @@ int writei(struct inode *ip, int user_src, uint64 src, uint off, uint n) {
 
 // 比较文件名
 int namecmp(const char *s, const char *t) { return strncmp(s, t, DIRSIZ); }
+
+// 给文件名 查找类型为文件夹的inode下的文件 返回文件描述符
+struct inode *dirlookup(struct inode *dp, char *name, uint *poff) {
+  uint off, inum;
+  struct dirent de;
+
+  if (dp->type != T_DIR) {
+    panic("dirlookup not DIR");
+  }
+
+  // 遍历文件夹的文件项
+  for (off = 0; off < dp->size; off += sizeof(de)) {
+    // 读一个文件项到de
+    if (readi(dp, 0, (uint64)&de, off, sizeof(de)) != sizeof(de)) {
+      panic("dirlookup read");
+    }
+    // 当前文件项无效
+    if (de.inum == 0) {
+      continue;
+    }
+    // 对比一下文件名
+    if (namecmp(name, de.name) == 0) {
+      if (poff) {
+        // 修改poff为文件夹类型inode中文件夹项的偏移地址
+        *poff = off;
+      }
+      // 读到了inode号
+      inum = de.inum;
+      // 分配一个inode内存节点
+      return iget(dp->dev, inum);
+    }
+  }
+
+  return 0;
+}
+
+// 给一个类型为文件夹的inode中写入一个新的文件夹项
+int dirlink(struct inode *dp, char *name, uint inum) {
+  int off;
+  struct dirent de;
+  struct inode *ip;
+
+  // 检查文件夹是不是已经存在了 存在了返回-1
+  if ((ip = dirlookup(dp, name, 0)) != 0) {
+    iput(ip);
+    return -1;
+  }
+
+  // 寻找空的文件夹项
+  for (off = 0; off < dp->size; off += sizeof(de)) {
+    if (readi(dp, 0, (uint64)&de, off, sizeof(de)) != sizeof(de)) {
+      panic("dirlink read");
+    }
+    if (de.inum == 0) {
+      break;
+    }
+  }
+  // 配置当前文件夹项
+  strncpy(de.name, name, DIRSIZ);
+  de.inum = inum;
+  // 修改文件夹inode的内容
+  if (writei(dp, 0, (uint64)&de, off, sizeof(de)) != sizeof(de)) {
+    return -1;
+  }
+  return 0;
+}
