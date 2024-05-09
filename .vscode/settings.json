@@ -17,6 +17,10 @@
         "fcntl.h": "c",
         "unistd.h": "c",
         "stat.h": "c",
-        "buf.h": "c"
+        "buf.h": "c",
+        "printf.h": "c",
+        "strings.h": "c",
+        "string.h": "c",
+        "limits": "c"
     }
 }

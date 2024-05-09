@@ -2,9 +2,10 @@ struct spinlock;
 struct sleeplock;
 struct proc;
 struct context;
+struct superblock;
 
-// bio.c
-void binit(void);               // 初始化buffer链表
+// bio.c 🎉
+void binit(void);               // 初始化buffer双向链表
 struct buf *bread(uint, uint);  // 给块号 返回带数据的buf
 void brelse(struct buf *);      // 释放当前buf的锁
 void bwrite(struct buf *);      // 向buf写
@@ -107,14 +108,17 @@ void acquiresleep(struct sleeplock *);  // 获得睡眠锁 如果有竞态 就�
 void releasesleep(struct sleeplock *);  // 释放睡眠锁 如果有人再等 就唤醒
 int holdingsleep(struct sleeplock *);  // 查询锁的持有状态
 
-// bio.c
-void binit(void);  // 初始化IO缓存双向循环链表
-
 // fs.c
 void iinit(void);  // 初始化inode表
 
 // file.c
 void fileinit(void);
+
+// log.c
+void initlog(int, struct superblock *);  // 事务初始化
+void log_write(struct buf *);            // 写块 记录日志
+void begin_op(void);                     // 操作开始
+void end_op(void);                       // 操作结束
 
 // swtch.S 🎉
 void swtch(struct context *, struct context *);  // 内核进程上下文切换

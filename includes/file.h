@@ -15,12 +15,12 @@ struct inode {
   int ref;                // 引用数量
   struct sleeplock lock;  // 保护读写inode
   int valid;              // inode是否被读入
-  short type;             // copy of disk inode
-  short major;
-  short minor;
-  short nlink;
-  uint size;
-  // uint addrs[NDIRECT + 1];
+  short type;             // 文件类型
+  short major;            // 设备号主
+  short minor;            // 设备号次
+  short nlink;            // 硬链接数
+  uint size;              // 文件大小
+  uint addrs[NDIRECT + 1];  // 映射地址 前12个直接映射 第13个间接映射
 };
 
 // 映射设备号到设备函数

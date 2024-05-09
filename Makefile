@@ -27,7 +27,9 @@ SRCS_C = \
  	$K/plic.c \
 	$K/bio.c \
 	$K/sleeplock.c \
-	$K/fs.c
+	$K/fs.c \
+	$K/virtio_disk.c \
+	$K/log.c
 
 
 
@@ -54,7 +56,7 @@ code : ${OBJS}
 
 # 启动
 run: all disk.img
-	@${QEMU} ${QFLAGS} -kernel kernel.elf
+	${QEMU} ${QFLAGS} -kernel kernel.elf
 
 # 调试
 debug: all

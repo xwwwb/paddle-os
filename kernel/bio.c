@@ -67,6 +67,7 @@ static struct buf* bget(uint dev, uint blockno) {
       b->refcnt = 1;
       release(&bcache.lock);
       acquiresleep(&b->lock);
+      printf("get buffer block");
       return b;
     }
   }
