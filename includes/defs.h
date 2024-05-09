@@ -3,7 +3,8 @@ struct sleeplock;
 struct proc;
 struct context;
 struct superblock;
-
+struct stat;
+struct inode;
 // bio.c 🎉
 void binit(void);               // 初始化buffer双向链表
 struct buf *bread(uint, uint);  // 给块号 返回带数据的buf
@@ -44,6 +45,7 @@ void *kalloc();  // 分配一个页的物理内存
 void *memset(void *, int, uint);            // 内存赋值
 void *memmove(void *, const void *, uint);  // 内存拷贝
 char *safestrcpy(char *, const char *, int);  // 安全的字符串拷贝 确保以0结尾
+int strncmp(const char *, const char *, uint);  // 字符串比大小
 
 // vm.c 🎉
 void kvminit(void);  // 内核虚拟内存初始化
@@ -109,12 +111,29 @@ void releasesleep(struct sleeplock *);  // 释放睡眠锁 如果有人再等 �
 int holdingsleep(struct sleeplock *);  // 查询锁的持有状态
 
 // fs.c
-void iinit(void);  // 初始化inode表
+void fsinit(int);  // 初始化文件系统 由第一个进程调用 因为用到了睡眠锁
+int dirlink(struct inode *, char *, uint);
+struct inode *dirlookup(struct inode *, char *, uint *);
+struct inode *ialloc(uint, short);   // 分配inode到磁盘
+struct inode *idup(struct inode *);  // inode引用次数自增
+void iinit();                        // 初始化内存inode表
+void ilock(struct inode *);          // 锁定inode
+void iput(struct inode *);           // 减少inode引用
+void iunlock(struct inode *);        // 解锁inode
+void iunlockput(struct inode *);     // 解锁inode+减少inode引用
+void iupdate(struct inode *);        // 更新inode到磁盘
+int namecmp(const char *, const char *);
+struct inode *namei(char *);
+struct inode *nameiparent(char *, char *);
+int readi(struct inode *, int, uint64, uint, uint);  // 从inode里面读内容
+void stati(struct inode *, struct stat *);           // 修改stat的状态
+int writei(struct inode *, int, uint64, uint, uint);
+void itrunc(struct inode *);  // 舍弃inode
 
 // file.c
 void fileinit(void);
 
-// log.c
+// log.c 🎉
 void initlog(int, struct superblock *);  // 事务初始化
 void log_write(struct buf *);            // 写块 记录日志
 void begin_op(void);                     // 操作开始
@@ -123,7 +142,7 @@ void end_op(void);                       // 操作结束
 // swtch.S 🎉
 void swtch(struct context *, struct context *);  // 内核进程上下文切换
 
-// virtio_disk.c
+// virtio_disk.c 🎉
 void virtio_disk_init(void);
 void virtio_disk_rw(struct buf *, int);
 void virtio_disk_intr(void);

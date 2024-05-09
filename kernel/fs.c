@@ -431,3 +431,55 @@ int readi(struct inode *ip, int user_dst, uint64 dst, uint off, uint n) {
   // 返回读入的字节数
   return tot;
 }
+
+// 写数据到inode
+// Caller must hold ip->lock.
+// 调用者必须由inode的锁 如果user_dst为1 说明dst是user vm
+// 返回写入数
+int writei(struct inode *ip, int user_src, uint64 src, uint off, uint n) {
+  uint tot, m;
+  struct buf *bp;
+
+  // n 小于零 或者偏移大于文件大小
+  if (off > ip->size || off + n < off) {
+    return -1;
+  }
+  // 超过单文件最大
+  if (off + n > MAXFILE * BSIZE) {
+    return -1;
+  }
+  // 和readi差不多
+  for (tot = 0; tot < n; tot += m, off += m, src += m) {
+    // 找到off开始地址的数据块
+    uint addr = bmap(ip, off / BSIZE);
+    if (addr == 0) {
+      break;
+    }
+    // 读入数据块到buf
+    bp = bread(ip->dev, addr);
+
+    // 计算写入大小 m是当次循环的写入大小
+    m = min(n - tot, BSIZE - off % BSIZE);
+    // 拷贝到buf
+    if (either_copyin(bp->data + (off % BSIZE), user_src, src, m) == -1) {
+      brelse(bp);
+      break;
+    }
+    log_write(bp);
+    brelse(bp);
+  }
+
+  // 更新文件大小
+  // off就是偏移地址+写入大小
+  // 如果超过了源文件大小 那off就是新文件大小
+  if (off > ip->size) {
+    ip->size = off;
+  }
+  // bmap可能修改了inode 写回磁盘
+  iupdate(ip);
+
+  return tot;
+}
+
+// 比较文件名
+int namecmp(const char *s, const char *t) { return strncmp(s, t, DIRSIZ); }
