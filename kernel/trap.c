@@ -107,8 +107,8 @@ void usertrap(void) {
     p->trapframe->epc += 4;
 
     intr_on();
-
-    // syscall();
+    // 调用系统调用处理函数
+    syscall();
   } else if ((which_dev = devintr()) != 0) {
     // ok
   } else {

@@ -162,5 +162,13 @@ void virtio_disk_init(void);
 void virtio_disk_rw(struct buf *, int);
 void virtio_disk_intr(void);
 
-// 固定大小的数组 返回元素数
+// syscall.c 🎉
+void argint(int, int *);            // 拿到一个int类型的参数
+int argstr(int, char *, int);       // 拿到一个str类型的参数
+void argaddr(int, uint64 *);        // 拿到一个指针参数
+int fetchstr(uint64, char *, int);  // 从用户态内存拿一个字符串
+int fetchaddr(uint64, uint64 *);    // 从用户态内存拿一个64位数
+void syscall();                     // 系统调用处理函数
+
+// 固定大小的数组 返回元素数 🎉
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))

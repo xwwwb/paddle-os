@@ -29,7 +29,8 @@ SRCS_C = \
 	$K/sleeplock.c \
 	$K/fs.c \
 	$K/virtio_disk.c \
-	$K/log.c
+	$K/log.c \
+	$K/syscall.c
 
 
 

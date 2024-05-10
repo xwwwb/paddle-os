@@ -21,6 +21,7 @@
         "printf.h": "c",
         "strings.h": "c",
         "string.h": "c",
-        "limits": "c"
+        "limits": "c",
+        "syscall.h": "c"
     }
 }
