@@ -5,6 +5,7 @@ struct context;
 struct superblock;
 struct stat;
 struct inode;
+
 // bio.c 🎉
 void binit(void);               // 初始化buffer双向链表
 struct buf *bread(uint, uint);  // 给块号 返回带数据的buf
@@ -13,9 +14,10 @@ void bwrite(struct buf *);      // 向buf写
 void bpin(struct buf *);        // 增加进程对buf的引用
 void bunpin(struct buf *);      // 减少进程对buf的引用
 
-// console.c
+// console.c 🎉
 void consoleinit();  // 初始化控制台设备
 void consputc(int);  // 放置一个字符到控制台 只允许kernel使用
+void consoleintr(int);  // 有字符输入的时候 调用这里 处理回显和输入
 
 // spinlock.c 🎉
 void initlock(struct spinlock *, char *);  // 初始化锁
@@ -25,10 +27,12 @@ int holding(struct spinlock *);            // 检查是否持有锁
 void push_off(void);                       // 关中断
 void pop_off(void);                        // 开中断
 
-// uart.c
+// uart.c  🎉
 void uartinit(void);      // 初始化uart设备
 void uartintr(void);      // uart中断处理
 void uartputc_sync(int);  // 同步输出单字符
+int uartgetc(void);       // 从uart读取字符
+void uartputc(int);       // 用户态写入
 
 // printf.c 🎉
 void printfinit(void);                         // 初始化printf
@@ -41,12 +45,14 @@ void kinit(void);  // 物理内存页分配初始化
 void kfree(void *);
 void *kalloc();  // 分配一个页的物理内存
 
-// string.c
+// string.c 🎉
 void *memset(void *, int, uint);            // 内存赋值
 void *memmove(void *, const void *, uint);  // 内存拷贝
 char *safestrcpy(char *, const char *, int);  // 安全的字符串拷贝 确保以0结尾
 int strncmp(const char *, const char *, uint);  // 字符串比大小
 char *strncpy(char *, const char *, int);       // 字符串拷贝
+int memcmp(const void *, const void *, uint);   // 内存比较
+int strlen(const char *);                       // 字符长度
 
 // vm.c 🎉
 void kvminit(void);  // 内核虚拟内存初始化
@@ -94,10 +100,12 @@ int either_copyin(void *dst, int user_src, uint64 src,
                   uint64 len);  // 从内核或者用户拷贝出
 void procdump(void);            // 打印当前进程列表信息 调试用
 
-// trap.c
-void trapinit(void);      // 初始化陷入
-void trapinithart(void);  // 初始化陷入处理函数
-void usertrapret(void);   // 返回用户态
+// trap.c 🎉
+void trapinit(void);               // 初始化陷入
+void trapinithart(void);           // 初始化陷入处理函数
+void usertrapret(void);            // 返回用户态
+extern struct spinlock tickslock;  // 保持ticks变量的原子化
+extern uint ticks;  // ticks 变量 用于进程睡眠系统调度
 
 // plic.c 🎉
 void plicinit(void);      // 初始化uart和虚拟io的优先级

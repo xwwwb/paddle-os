@@ -6,7 +6,7 @@
 #include "defs.h"
 
 struct spinlock tickslock;
-uint ticks;
+uint ticks;  // 用于睡眠系统调用
 
 // 这三个符号在trampoline.S中
 extern char trampoline[], uservec[], userret[];
@@ -73,7 +73,7 @@ void kerneltrap() {
 void clockintr() {
   acquire(&tickslock);
   ticks++;
-  // wakeup(&ticks);
+  wakeup(&ticks);
   release(&tickslock);
 }
 
@@ -106,9 +106,7 @@ void usertrap(void) {
     // 系统调用需要让epc向下移动32位 否则会重复触发系统调用
     p->trapframe->epc += 4;
 
-    // // an interrupt will change sepc, scause, and sstatus,
-    // // so enable only now that we're done with those registers.
-    // intr_on();
+    intr_on();
 
     // syscall();
   } else if ((which_dev = devintr()) != 0) {

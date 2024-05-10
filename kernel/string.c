@@ -76,3 +76,24 @@ char *strncpy(char *s, const char *t, int n) {
   }
   return os;
 }
+
+// 内存比较
+int memcmp(const void *v1, const void *v2, uint n) {
+  const uchar *s1, *s2;
+  s1 = v1;
+  s2 = v2;
+  while (n-- > 0) {
+    if (*s1 != *s2) {
+      return *s1 - *s2;
+    }
+    s1++, s2++;
+  }
+  return 0;
+}
+
+// 字符串长度 找到字符串结尾
+int strlen(const char *s) {
+  int n;
+  for (n = 0; s[n]; n++);
+  return n;
+}

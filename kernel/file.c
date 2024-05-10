@@ -123,6 +123,7 @@ int fileread(struct file* f, uint64 addr, int n) {
   } else {
     panic("fileread");
   }
+  return r;
 }
 
 int filewrite(struct file* f, uint64 addr, int n) {
@@ -133,7 +134,7 @@ int filewrite(struct file* f, uint64 addr, int n) {
   }
 
   if (f->type == FD_PIPE) {
-    ret = pipewrite(f->pipe, addr, n);
+    // ret = pipewrite(f->pipe, addr, n);
   } else if (f->type == FD_DEVICE) {
     if (f->major < 0 || f->major >= NDEV || !devsw[f->major].write) {
       return -1;

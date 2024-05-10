@@ -359,6 +359,8 @@ void forkret(void) {
 // 这里的进程一定是进程的内核进程
 // 而不是用户进程 或者说用户进程已经陷入之后才可以执行这里的sleep
 // 主要用于释放CPU 当wakeup的时候再回来
+// sleep会释放参数传入的锁 为了防止外部死锁
+// 当回到sleep的时候 会重新上锁
 void sleep(void* chan, struct spinlock* lk) {
   // 因为要修改进程状态 所以一定要拿到p->lock
   struct proc* p = myproc();
