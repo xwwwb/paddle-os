@@ -2,6 +2,7 @@
 #include "spinlock.h"
 #include "sleeplock.h"
 #include "riscv.h"
+#include "fs.h"
 #include "file.h"
 #include "defs.h"
 

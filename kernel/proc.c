@@ -347,7 +347,7 @@ void forkret(void) {
 
   if (first) {
     first = 0;
-    // fsinit(ROOTDEV);
+    fsinit(ROOTDEV);
   }
 
   // 进入到用户陷入恢复程序 主要用于进入用户空间
@@ -398,7 +398,7 @@ void wakeup(void* chan) {
 // 创建一个新进程 拷贝父进程的内存数据
 // 设置新进程的内核栈 因为要从陷入恢复到用户栈
 int fork(void) {
-  int i, pid;
+  int pid;
   struct proc* np;  // 新进程
   struct proc* p = myproc();
 

@@ -46,6 +46,7 @@ void *memset(void *, int, uint);            // 内存赋值
 void *memmove(void *, const void *, uint);  // 内存拷贝
 char *safestrcpy(char *, const char *, int);  // 安全的字符串拷贝 确保以0结尾
 int strncmp(const char *, const char *, uint);  // 字符串比大小
+char *strncpy(char *, const char *, int);       // 字符串拷贝
 
 // vm.c 🎉
 void kvminit(void);  // 内核虚拟内存初始化

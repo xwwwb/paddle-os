@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "sleeplock.h"
 #include "proc.h"
+#include "fs.h"
 #include "file.h"
 
 // 退格键

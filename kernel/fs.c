@@ -7,6 +7,7 @@
 #include "file.h"
 #include "buf.h"
 #include "stat.h"
+#include "proc.h"
 #include "defs.h"
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
@@ -210,6 +211,9 @@ static struct inode *iget(uint dev, uint inum) {
   ip->inum = inum;
   ip->ref = 1;
   ip->valid = 0;
+  release(&itable.lock);
+
+  return ip;
 }
 
 // 增加引用数量
@@ -547,4 +551,99 @@ int dirlink(struct inode *dp, char *name, uint inum) {
     return -1;
   }
   return 0;
+}
+
+// 路径解析
+// 返回路径的根目录名 修改name参数为剩余目录名
+// 比如
+//   skipelem("a/bb/c", name) = "bb/c", setting name = "a"
+//   skipelem("///a//bb", name) = "bb", setting name = "a"
+//   skipelem("a", name) = "", setting name = "a"
+//   skipelem("", name) = skipelem("////", name) = 0
+static char *skipelem(char *path, char *name) {
+  char *s;
+  int len;
+
+  // 如果路径以斜杠开头 去除所有开头的斜杠
+  while (*path == '/') {
+    path++;
+  }
+
+  // 如果遇见了0 说明结尾了
+  if (*path == 0) {
+    return 0;
+  }
+  // 处理完斜杠了
+  s = path;
+  // 用path提取出来有效目录
+  while (*path != '/' && *path != 0) {
+    path++;
+  }
+  len = path - s;
+  // 参数name变为被截断的名称
+  if (len >= DIRSIZ) {
+    memmove(name, s, DIRSIZ);
+  } else {
+    memmove(name, s, len);
+    name[len] = 0;
+  }
+  // 被截取的目录之后的斜杠
+  while (*path == '/') {
+    path++;
+  }
+  // path剩余路径
+  return path;
+}
+
+// 根据路径寻找文件的inode
+// nameiparent为真 返回路径的文件的目录
+static struct inode *namex(char *path, int nameiparent, char *name) {
+  struct inode *ip, *next;
+  if (*path == '/') {
+    // 从根目录开始找
+    ip = iget(ROOTDEV, ROOTINO);
+  } else {
+    // 从进程当前的路径
+    ip = idup(myproc()->cwd);
+  }
+  // 每次循环 判断是否有剩余目录
+  while ((path = skipelem(path, name)) != 0) {
+    ilock(ip);
+    if (ip->type != T_DIR) {
+      // iget的时候会ref++ 这里也需要ref--
+      iunlockput(ip);
+      return 0;
+    }
+    // 如果需要的是父目录 并且剩下的路径已经为空
+    // 则当前结点就是i结点直接返回
+    if (nameiparent && *path == '\0') {
+      iunlock(ip);
+      return ip;
+    }
+    // 从当前的文件夹文件描述符中 寻找名为name的文件
+    // 此时的name已经是被skipelem裁掉的路径
+    if ((next = dirlookup(ip, name, 0)) == 0) {
+      iunlockput(ip);
+      return 0;
+    }
+    iunlockput(ip);
+    ip = next;
+  }
+  if (nameiparent) {
+    iput(ip);
+    return 0;
+  }
+  return ip;
+}
+
+// 返回的是路径指向的inode
+struct inode *namei(char *path) {
+  char name[DIRSIZ];
+  return namex(path, 0, name);
+}
+
+// 返回的是路径指向的inode的父目录的inode
+// 如果name参数是只供给skipelem写 为什么这里要传入name
+struct inode *nameiparent(char *path, char *name) {
+  return namex(path, 1, name);
 }

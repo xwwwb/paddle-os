@@ -95,5 +95,5 @@ struct proc {
   struct trapframe *trapframe;  // 发生陷入的时候保存上下文用
   struct context context;       // swtch在这里保存内核态上下文
   // struct file *ofile[NOFILE];   // Open files
-  // struct inode *cwd;            // Current directory
+  struct inode *cwd;  // 进程当前的文件夹
 };

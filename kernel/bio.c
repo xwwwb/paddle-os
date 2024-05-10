@@ -67,7 +67,6 @@ static struct buf* bget(uint dev, uint blockno) {
       b->refcnt = 1;
       release(&bcache.lock);
       acquiresleep(&b->lock);
-      printf("get buffer block");
       return b;
     }
   }
@@ -83,6 +82,7 @@ struct buf* bread(uint dev, uint blockno) {
     // 读入到buf
     virtio_disk_rw(b, 0);
   }
+
   return b;
 }
 

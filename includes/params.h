@@ -21,3 +21,6 @@
 
 // 文件系统可以管理的块数 也就是2000kb的大小的磁盘
 #define FSSIZE 2000
+
+// 磁盘设备号
+#define ROOTDEV 1

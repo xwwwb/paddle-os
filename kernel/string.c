@@ -64,3 +64,15 @@ int strncmp(const char *p, const char *q, uint n) {
   // 返回第一个不相同字符的大小比较
   return (uchar)*p - (uchar)*q;
 }
+
+// 字符串拷贝
+char *strncpy(char *s, const char *t, int n) {
+  char *os;
+
+  os = s;
+  while (n-- > 0 && (*s++ = *t++) != 0);
+  while (n-- > 0) {
+    *s++ = 0;
+  }
+  return os;
+}
