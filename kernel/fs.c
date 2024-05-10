@@ -31,6 +31,7 @@ void fsinit(int dev) {
   if (sb.magic != FSMAGIC) {
     panic("invalid file system");
   }
+
   initlog(dev, &sb);
 }
 
@@ -125,7 +126,7 @@ void iinit() {
     initsleeplock(&itable.inode[i].lock, "inode");
   }
 
-  printf("inode table init:\t\t done!\n");
+  printf("memory inode table init:\t done!\n");
 }
 
 static struct inode *iget(uint dev, uint inum);

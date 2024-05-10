@@ -111,7 +111,7 @@ void acquiresleep(struct sleeplock *);  // 获得睡眠锁 如果有竞态 就�
 void releasesleep(struct sleeplock *);  // 释放睡眠锁 如果有人再等 就唤醒
 int holdingsleep(struct sleeplock *);  // 查询锁的持有状态
 
-// fs.c
+// fs.c 🎉
 void fsinit(int);  // 初始化文件系统 由第一个进程调用 因为用到了睡眠锁
 int dirlink(struct inode *, char *, uint);
 struct inode *dirlookup(struct inode *, char *, uint *);
@@ -131,8 +131,14 @@ void stati(struct inode *, struct stat *);           // 修改stat的状态
 int writei(struct inode *, int, uint64, uint, uint);
 void itrunc(struct inode *);  // 舍弃inode
 
-// file.c
-void fileinit(void);
+// file.c 🎉
+struct file *filealloc(void);                 // 分配文件结构
+void fileclose(struct file *);                // 关闭文件结构
+struct file *filedup(struct file *);          // 增加引用
+void fileinit(void);                          // 文件表初始化
+int fileread(struct file *, uint64, int n);   // 文件读
+int filestat(struct file *, uint64 addr);     // 读stat到用户空间
+int filewrite(struct file *, uint64, int n);  // 文件写
 
 // log.c 🎉
 void initlog(int, struct superblock *);  // 事务初始化
