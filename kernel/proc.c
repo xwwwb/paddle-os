@@ -229,7 +229,7 @@ void userinit(void) {
   p->trapframe->sp = PGSIZE;  // 用户栈顶在4096处 在第一个页顶部
 
   safestrcpy(p->name, "initcode", sizeof(p->name));
-  // p->cmd = namei("/");
+  p->cwd = namei("/");
   // 为调度做准备
   p->state = RUNNABLE;
   release(&p->lock);

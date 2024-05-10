@@ -71,6 +71,9 @@ void kerneltrap() {
 
 // 时钟中断发生时 执行这里
 void clockintr() {
+  // 这里wakeup唤醒的是sleep系统调用
+  // 系统调用在比较一下当前时间和发生系统调用时的时间
+  // 然后选择是继续睡眠还是退出睡眠
   acquire(&tickslock);
   ticks++;
   wakeup(&ticks);
