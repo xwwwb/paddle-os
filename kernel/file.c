@@ -71,6 +71,7 @@ void fileclose(struct file* f) {
 
   // 关闭文件
   if (ff.type == FD_PIPE) {
+    pipeclose(ff.pipe, ff.writable);
   } else if (ff.type == FD_INODE || ff.type == FD_DEVICE) {
     begin_op();
     iput(ff.ip);
@@ -105,7 +106,7 @@ int fileread(struct file* f, uint64 addr, int n) {
     return -1;
   }
   if (f->type == FD_PIPE) {
-    // r =
+    r = piperead(f->pipe, addr, n);
   } else if (f->type == FD_DEVICE) {
     // 设备读
     if (f->major < 0 || f->major >= NDEV || !devsw[f->major].read) {
@@ -134,7 +135,7 @@ int filewrite(struct file* f, uint64 addr, int n) {
   }
 
   if (f->type == FD_PIPE) {
-    // ret = pipewrite(f->pipe, addr, n);
+    ret = pipewrite(f->pipe, addr, n);
   } else if (f->type == FD_DEVICE) {
     if (f->major < 0 || f->major >= NDEV || !devsw[f->major].write) {
       return -1;

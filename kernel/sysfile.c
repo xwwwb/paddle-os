@@ -563,3 +563,43 @@ bad:
   }
   return -1;
 }
+
+// 创建管道
+// 只有一个参数
+// 参数中的两个文件描述符分别指向管道的读和写
+uint64 sys_pipe(void) {
+  uint64 fdarray;
+  struct file *rf, *wf;
+  int fd0, fd1;
+  struct proc *p = myproc();
+
+  argaddr(0, &fdarray);
+  // 开启管道
+  if (pipealloc(&rf, &wf) < 0) {
+    return -1;
+  }
+  fd0 = -1;
+  // 分配两个文件结构体
+  if ((fd0 = fdalloc(rf)) < 0 || (fd1 = fdalloc(wf)) < 0) {
+    // 如果分配失败 关闭文件
+    // 如果第一个分配成功 第二个失败 也要关闭第一个
+    if (fd0 >= 0) {
+      p->ofile[fd0] = 0;
+    }
+    fileclose(rf);
+    fileclose(wf);
+    return -1;
+  }
+  // 把两个文件数字也就是文件描述符写入用户空间
+  if (copyout(p->pagetable, fdarray, (char *)&fd0, sizeof(fd0)) < 0 ||
+      copyout(p->pagetable, fdarray + sizeof(fd0), (char *)&fd1, sizeof(fd1)) <
+          0) {
+    // 失败
+    p->ofile[fd0] = 0;
+    p->ofile[fd1] = 0;
+    fileclose(rf);
+    fileclose(wf);
+    return -1;
+  }
+  return 0;
+}
