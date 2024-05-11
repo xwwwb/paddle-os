@@ -156,7 +156,7 @@ void printfinit(void) {
 }
 
 void bootinfo() {
-  printf("paddle-os kernel is booting......\n");
+  printf("\npaddle-os kernel is booting......\n\n");
   printf("console init:\t\t\t done!\n");
   printf("printf init:\t\t\t done!\n");
 }

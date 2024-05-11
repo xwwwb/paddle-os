@@ -69,7 +69,7 @@ static void install_trans(int recovering) {
 static void read_head(void) {
   // 读日志区的第一个block
   struct buf *buf = bread(log.dev, log.start);
-  struct logheader *lh = (struct logheader *)buf->data;
+  struct logheader *lh = (struct logheader *)(buf->data);
   int i;
   log.lh.n = lh->n;
   for (i = 0; i < log.lh.n; i++) {

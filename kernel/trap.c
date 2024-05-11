@@ -98,7 +98,7 @@ void usertrap(void) {
 
   // 保存陷入发生时用户态的程序计数器
   p->trapframe->epc = r_sepc();
-
+  
   if (r_scause() == 8) {
     // 系统调用
     // 如果当前进程是被标记为killed 就在此时处理
@@ -197,7 +197,10 @@ int devintr() {
     }
 
     return 1;
-  } else if (scause & 0x8000000000000001L) {
+
+  }
+  // 这里的符号是 是否等于 不是与号
+  else if (scause == 0x8000000000000001L) {
     // S模式软中断
     // 能触发这里 说明是从M模式的定时器中断处理函数里面来的
     if (cpuid() == 0) {
