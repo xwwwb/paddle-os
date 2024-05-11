@@ -24,3 +24,9 @@
 
 // 磁盘设备号
 #define ROOTDEV 1
+
+// exec可以传入的最大的参数
+#define MAXARG 32
+
+// 最大路径长度
+#define MAXPATH 128

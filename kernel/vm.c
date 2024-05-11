@@ -237,7 +237,7 @@ uint64 uvmalloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz, int xperm) {
     mem = kalloc();
     if (mem == 0) {
       // 释放空间
-      uvmdealloc(pagetable, address, oldsz);
+      uvmdealloc(pagetable, address, oldsz); 
       return 0;
     }
     memset(mem, 0, PGSIZE);
@@ -248,7 +248,7 @@ uint64 uvmalloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz, int xperm) {
       return 0;
     }
   }
-  return 0;
+  return newsz;
 }
 
 // 通过虚拟地址和页号移除内存映射关系 虚拟地址要是页对齐的

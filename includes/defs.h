@@ -170,5 +170,8 @@ int fetchstr(uint64, char *, int);  // 从用户态内存拿一个字符串
 int fetchaddr(uint64, uint64 *);    // 从用户态内存拿一个64位数
 void syscall();                     // 系统调用处理函数
 
+// exec.c
+int exec(char *, char **);  // 替换当前进程
+
 // 固定大小的数组 返回元素数 🎉
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))

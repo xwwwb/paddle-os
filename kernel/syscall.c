@@ -12,7 +12,7 @@ extern uint64 sys_wait(void);
 // extern uint64 sys_pipe(void);
 // extern uint64 sys_read(void);
 extern uint64 sys_kill(void);
-// extern uint64 sys_exec(void);
+extern uint64 sys_exec(void);
 // extern uint64 sys_fstat(void);
 // extern uint64 sys_chdir(void);
 // extern uint64 sys_dup(void);
@@ -37,7 +37,7 @@ static uint64 (*syscalls[])(void) = {
     // [SYS_pipe] sys_pipe,
     // [SYS_read] sys_read,
     [SYS_kill] sys_kill,
-    // [SYS_exec] sys_exec,
+    [SYS_exec] sys_exec,
     // [SYS_fstat] sys_fstat,
     // [SYS_chdir] sys_chdir,
     // [SYS_dup] sys_dup,
@@ -105,6 +105,7 @@ int fetchstr(uint64 addr, char *buf, int max) {
 }
 
 // 获取一个64位的数 从给定的用户态地址addr获得
+// 从addr取到地址后写入ip中
 int fetchaddr(uint64 addr, uint64 *ip) {
   struct proc *p = myproc();
   // 如果地址在页表以外 或地址+64位后再页表以外
@@ -125,6 +126,8 @@ void argint(int n, int *ip) { *ip = argraw(n); }
 void argaddr(int n, uint64 *ip) { *ip = argraw(n); }
 
 // 取参数中的字符串
+// 由于寄存器中存的是地址 所以用argaddr先取地址
+// 然后把地址中的字符串拷贝到内核空间
 int argstr(int n, char *buf, int max) {
   uint64 addr;
   // 取出字符串参数的地址

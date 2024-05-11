@@ -31,7 +31,9 @@ SRCS_C = \
 	$K/virtio_disk.c \
 	$K/log.c \
 	$K/syscall.c \
-	$K/sysproc.c
+	$K/sysproc.c \
+	$K/exec.c \
+	$K/sysfile.c
 
 
 
