@@ -415,6 +415,7 @@ int fork(void) {
     freeproc(np);
     // alloc的时候锁还是持有的
     release(&np->lock);
+    return -1;
   }
   np->sz = p->sz;
   // 拷贝父进程的trapframe

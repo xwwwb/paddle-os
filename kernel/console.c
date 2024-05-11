@@ -47,7 +47,7 @@ int consolewrite(int user_src, uint64 src, int n) {
     }
     uartputc(c);
   }
-  return 0;
+  return i;
 }
 
 // 用户使用read()从console读数据调用这

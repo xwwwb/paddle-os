@@ -237,7 +237,7 @@ uint64 uvmalloc(pagetable_t pagetable, uint64 oldsz, uint64 newsz, int xperm) {
     mem = kalloc();
     if (mem == 0) {
       // 释放空间
-      uvmdealloc(pagetable, address, oldsz); 
+      uvmdealloc(pagetable, address, oldsz);
       return 0;
     }
     memset(mem, 0, PGSIZE);
@@ -316,8 +316,8 @@ void uvmfree(pagetable_t pagetable, uint64 sz) {
   if (sz > 0) {
     // 接触关联和清除页表
     uvmunmap(pagetable, 0, PGROUNDUP(sz) / PGSIZE, 1);
-    freewalk(pagetable);
   }
+  freewalk(pagetable);
 }
 
 // 减少空间
