@@ -64,6 +64,17 @@ int exec(char *path, char **argv) {
     if (ph.type != ELF_PROG_LOAD) {
       continue;
     }
+
+    if (ph.memsz < ph.filesz) {
+      goto bad;
+    }
+    if (ph.vaddr + ph.memsz < ph.vaddr) {
+      goto bad;
+    }
+    if (ph.vaddr % PGSIZE != 0) {
+      goto bad;
+    }
+
     uint64 sz1;
     // oldsz 是sz newsz是ph.vaddr+ph.memsz
     // ph.vaddr是Segment第一个字节在虚拟地址的起始位置
