@@ -175,10 +175,11 @@ int main(int argc, char *argv[]) {
   for (i = 2; i < argc; i++) {
     // 拷贝文件的时候 去掉user/前缀
     char *shortname;
-    if (strncmp(argv[i], "user/", 5) == 0)
+    if (strncmp(argv[i], "user/", 5) == 0) {
       shortname = argv[i] + 5;
-    else
+    } else {
       shortname = argv[i];
+    }
 
     // 确保文件名中没有/
     // 断言当条件为假会报错
@@ -198,6 +199,12 @@ int main(int argc, char *argv[]) {
     // 分配一个文件夹目录项指向该文件并且把文件夹目录项放入根目录
     bzero(&de, sizeof(de));
     de.inum = xshort(inum);
+    // 去掉尾部的.paddle
+    if (strlen(shortname) >= 7 &&
+        strcmp(shortname + strlen(shortname) - 7, ".paddle") == 0) {
+      shortname[strlen(shortname) - 7] = 0;
+    }
+
     strncpy(de.name, shortname, DIRSIZ);
     iappend(rootino, &de, sizeof(de));
 

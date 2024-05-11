@@ -2,7 +2,7 @@
 #include "types.h"
 #include "riscv.h"
 #include "defs.h"
-
+#include "params.h"
 #include "spinlock.h"
 #include "proc.h"
 
@@ -147,8 +147,7 @@ void panic(char *s) {
   printf(s);
   printf("\n");
   panicked = 1;  // 禁止所有CPU的uart输出
-  for (;;)
-    ;
+  for (;;);
 }
 
 void printfinit(void) {

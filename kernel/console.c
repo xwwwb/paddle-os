@@ -4,6 +4,7 @@
 #include "defs.h"
 #include "spinlock.h"
 #include "sleeplock.h"
+#include "params.h"
 #include "proc.h"
 #include "fs.h"
 #include "file.h"

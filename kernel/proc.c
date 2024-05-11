@@ -400,7 +400,7 @@ void wakeup(void* chan) {
 // 创建一个新进程 拷贝父进程的内存数据
 // 设置新进程的内核栈 因为要从陷入恢复到用户栈
 int fork(void) {
-  int pid;
+  int pid, i;
   struct proc* np;  // 新进程
   struct proc* p = myproc();
 
@@ -425,10 +425,13 @@ int fork(void) {
   np->trapframe->a0 = 0;
 
   // 增加文件的引用数量
-  // increment reference counts on open file descriptors.
-  // for (i = 0; i < NOFILE; i++)
-  //   if (p->ofile[i]) np->ofile[i] = filedup(p->ofile[i]);
-  // np->cwd = idup(p->cwd);
+  for (i = 0; i < NOFILE; i++) {
+    if (p->ofile[i]) {
+      np->ofile[i] = filedup(p->ofile[i]);
+    }
+  }
+  // 不进行这一个操作 调度时会报错 sched locks
+  np->cwd = idup(p->cwd);
 
   safestrcpy(np->name, p->name, sizeof(p->name));
   pid = np->pid;
@@ -470,17 +473,18 @@ void exit(int status) {
   }
 
   // 关闭打开的文件
-  //  for(int fd = 0; fd < NOFILE; fd++){
-  //   if(p->ofile[fd]){
-  //     struct file *f = p->ofile[fd];
-  //     fileclose(f);
-  //     p->ofile[fd] = 0;
-  //   }
-  // }
-  //  begin_op();
-  // iput(p->cwd);
-  // end_op();
-  // p->cwd = 0;
+  // 遍历所有文件描述符
+  for (int fd = 0; fd < NOFILE; fd++) {
+    if (p->ofile[fd]) {
+      struct file* f = p->ofile[fd];
+      fileclose(f);
+      p->ofile[fd] = 0;
+    }
+  }
+  begin_op();
+  iput(p->cwd);
+  end_op();
+  p->cwd = 0;
 
   acquire(&wait_lock);
 

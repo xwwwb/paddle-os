@@ -3,6 +3,7 @@
 #include "spinlock.h"
 #include "memlayout.h"
 #include "riscv.h"
+#include "params.h"
 #include "defs.h"
 #include "proc.h"
 // 由链接脚本提供的地址

@@ -2,6 +2,7 @@
 #include "riscv.h"
 #include "defs.h"
 #include "spinlock.h"
+#include "params.h"
 #include "proc.h"
 
 // 初始化自旋锁

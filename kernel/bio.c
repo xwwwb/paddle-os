@@ -81,6 +81,8 @@ struct buf* bread(uint dev, uint blockno) {
   if (!b->valid) {
     // 读入到buf
     virtio_disk_rw(b, 0);
+    // 标记为有效位！
+    b->valid = 1;
   }
 
   return b;

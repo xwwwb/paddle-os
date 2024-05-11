@@ -618,6 +618,7 @@ static struct inode *namex(char *path, int nameiparent, char *name) {
     // 如果需要的是父目录 并且剩下的路径已经为空
     // 则当前结点就是i结点直接返回
     if (nameiparent && *path == '\0') {
+      // 此时的name是路径的最后的部分
       iunlock(ip);
       return ip;
     }
@@ -644,7 +645,7 @@ struct inode *namei(char *path) {
 }
 
 // 返回的是路径指向的inode的父目录的inode
-// 如果name参数是只供给skipelem写 为什么这里要传入name
+// 返回父目录的inode并将路径的最后一项复制到name中
 struct inode *nameiparent(char *path, char *name) {
   return namex(path, 1, name);
 }

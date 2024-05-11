@@ -5,7 +5,7 @@ struct file {
   char writable;
   struct pipe *pipe;  // FD_PIPE
   struct inode *ip;   // FD_INODE and FD_DEVICE
-  uint off;           // FD_INODE
+  uint off;           // FD_INODE 使用的属性 当前文件的读指针偏移
   short major;        // FD_DEVICE
 };
 

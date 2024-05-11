@@ -6,8 +6,8 @@
 #include "file.h"
 #include "stat.h"
 #include "defs.h"
-#include "proc.h"
 #include "params.h"
+#include "proc.h"
 
 struct {
   struct spinlock lock;

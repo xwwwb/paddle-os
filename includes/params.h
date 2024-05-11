@@ -7,10 +7,13 @@
 // 进程最大数
 #define NPROC 64
 
+// 文件系统可操作的最大文件块数
 #define MAXOPBLOCKS 10
 
+// 日志块大小
 #define LOGSIZE (MAXOPBLOCKS * 3)
 
+// 磁盘buffer的大小
 #define NBUF (MAXOPBLOCKS * 3)
 
 // 最大的活跃的inode数量 加载到内存中的Inode数
@@ -30,3 +33,9 @@
 
 // 最大路径长度
 #define MAXPATH 128
+
+// 每个进程可以打开的文件数
+#define NOFILE 16
+
+// 系统可以打开的文件数
+#define NFILE 100
