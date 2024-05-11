@@ -63,7 +63,9 @@ static uint balloc(uint dev) {
     // b + bi是当前位表示的块号
     for (bi = 0; bi < BPB && b + bi < sb.size; bi++) {
       // 当前位的掩码
-      m = 1 << (bi / 8);
+      // 这里之前写成了除号 导致位图块的数据不对 unlink的时候会出错执行了itrunc
+      // 清除位图块的时候发现当前块是空的
+      m = 1 << (bi % 8);
       if ((bp->data[bi / 8] & m) == 0) {
         // 当前位是空的
         bp->data[bi / 8] |= m;  // 标记已使用

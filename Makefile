@@ -33,39 +33,57 @@ SRCS_C = \
 	$K/syscall.c \
 	$K/sysproc.c \
 	$K/exec.c \
-	$K/sysfile.c
+	$K/sysfile.c \
+	$K/pipe.c
 
-
+# 用户态APP
+SRC = \
+	
 
 # 建立目标文件
 OBJS = ${SRCS_ASM:.S=.o}
 OBJS += ${SRCS_C:.c=.o}
 
+USER_APPS = ${SRC:.c=.paddle}
+USER_OBJS = ${SRC:.c=.o}
+
 # 默认启动命令
 .DEFAULT_GOAL := all
 
+# 生成磁盘镜像
+disk.img: mkfs/mkfs README ${USER_APPS}
+	mkfs/mkfs disk.img README ${USER_APPS}
+
+# 生成目标文件
+all: kernel user disk.img
+
+# 生成内核
+kernel: ${OBJS}
+	@${CC} ${CFLAGS} -T $K/kernel.ld -o kernel.elf $^
+
+# 生成用户态APP
+# 遍历USER_OBJS 根据user/user.ld 连接为.paddle文件
+user: ${USER_APPS}
+
+%.paddle: %.c
+	${CC} ${CFLAGS} -T $U/user.ld -o $@ $<
+
+# 启动虚拟机
+run: all
+	${QEMU} ${QFLAGS} -kernel kernel.elf
+
+# 生成格式化程序
 mkfs/mkfs: mkfs/mkfs.c
 	gcc -Werror -Wall -o mkfs/mkfs -I. mkfs/mkfs.c
 
-disk.img: mkfs/mkfs 
-	@mkfs/mkfs disk.img README.md
-
-# 生成目标文件
-all: ${OBJS}
-	@${CC} ${CFLAGS} -T $K/kernel.ld -o kernel.elf $^
-
 # 生成汇编
 code : ${OBJS}
-	@${OBJDUMP} -S ${OBJS} | less
-
-# 启动
-run: all disk.img
-	${QEMU} ${QFLAGS} -kernel kernel.elf
+	${OBJDUMP} -S ${OBJS} | less
 
 # 调试
 debug: all
 	${QEMU} ${QFLAGS} -kernel kernel.elf -s -S &
-	@${GDB} kernel.elf -q -x ./gdbinit
+	${GDB} kernel.elf -q -x ./gdbinit
 
 # 供给vscode用
 qemu-debug: all
@@ -78,5 +96,7 @@ qemu-debug: all
 %.o : %.S
 	${CC} ${CFLAGS} -c -o $@ $<
 
+
+# 清理文件
 clean:
-	rm -f ${OBJS} kernel.elf disk.img mkfs/mkfs
+	rm -f ${OBJS} kernel.elf disk.img mkfs/mkfs ${USER_APPS} ${USER_OBJS}
