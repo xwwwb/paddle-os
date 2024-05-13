@@ -40,7 +40,9 @@ SRCS_C = \
 SRC = \
 	$U/init.c \
 	$U/sh.c \
-	$U/helloworld.c
+	$U/helloworld.c \
+	$U/ls.c \
+	$U/cat.c
 	
 
 # 建立目标文件
