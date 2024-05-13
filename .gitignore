@@ -3,3 +3,4 @@
 *.img
 mkfs/mkfs
 *.paddle
+usys.S

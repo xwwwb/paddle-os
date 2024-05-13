@@ -51,30 +51,22 @@ USER_OBJS = ${SRC:.c=.o}
 # 默认启动命令
 .DEFAULT_GOAL := all
 
-# 生成磁盘镜像
-disk.img: mkfs/mkfs README ${USER_APPS}
-	mkfs/mkfs disk.img README ${USER_APPS}
-
 # 生成目标文件
 all: kernel user disk.img
 
-# 生成内核
-kernel: ${OBJS}
-	${LD} -z max-page-size=4096 -T $K/kernel.ld -o kernel.elf $^
-
-# 用户态的静态链接库
-ULIB = $U/usys.o $U/ulib.o
-
-# 生成系统调用相关文件
-$U/usys.S: $U/usys.py
-	$(PYTHON) $U/usys.py > $U/usys.S
+# 伪目标文件
+kernel: kernel.elf
 
 # 生成用户态APP
 user: ${USER_APPS}
 
-# 从.o 链接静态链接库 生成app文件
-%.paddle: %.o ${ULIB}
-	${LD} -z max-page-size=4096 -T $U/user.ld -o $@ $^
+# 生成磁盘镜像
+disk.img: mkfs/mkfs README ${USER_APPS}
+	mkfs/mkfs disk.img README ${USER_APPS}
+
+# 生成内核
+kernel.elf: ${OBJS}
+	${LD} -z max-page-size=4096 -T $K/kernel.ld -o kernel.elf $^
 
 # 启动虚拟机
 run: all
@@ -98,6 +90,9 @@ qemu-debug: all
 	@echo "start qemu debug"
 	${QEMU} ${QFLAGS} -kernel kernel.elf -s -S
 
+# 清理文件
+clean:
+	rm -f ${OBJS} kernel.elf disk.img mkfs/mkfs user/usys.o user/usys.S ${USER_APPS} ${USER_OBJS}
 
 # 内核C到目标文件
 kernel/%.o : kernel/%.c
@@ -115,6 +110,14 @@ user/%.o : user/%.c
 user/%.o : user/%.S
 	${CC} -I. -c -o $@ $<
 
-# 清理文件
-clean:
-	rm -f ${OBJS} kernel.elf disk.img mkfs/mkfs user/usys.o user/usys.S ${USER_APPS} ${USER_OBJS}
+
+# 用户态的静态链接库
+ULIB = $U/usys.o $U/ulib.o
+
+# 生成系统调用相关文件
+$U/usys.S: $U/usys.py
+	$(PYTHON) $U/usys.py > $U/usys.S
+
+# 从.o 链接静态链接库 生成app文件
+%.paddle: %.o ${ULIB}
+	${LD} -z max-page-size=4096 -T $U/user.ld -o $@ $^
