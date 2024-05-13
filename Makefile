@@ -39,7 +39,8 @@ SRCS_C = \
 # 用户态APP
 SRC = \
 	$U/init.c \
-	$U/sh.c
+	$U/sh.c \
+	$U/helloworld.c
 	
 
 # 建立目标文件

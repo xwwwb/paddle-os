@@ -21,9 +21,9 @@ int main(void) {
 
   dup(0);  // fid 1 标准输出
   dup(0);  // fid 2 标准错误输出
-
   for (;;) {
-    printf("正在启动shell\n");
+    printf("\n正在启动shell\n\n");
+    printf("欢迎进入 PADDLE OS\n");
     pid = fork();
     if (pid < 0) {
       printf("进程fork失败\n");
