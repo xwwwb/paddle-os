@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "*.vue": "vue",
+        "*.ld": "plaintext",
+        "types.h": "c",
+        "stat.h": "c",
+        "user.h": "c",
+        "spinlock.h": "c",
+        "sleeplock.h": "c",
+        "fs.h": "c"
+    }
+}

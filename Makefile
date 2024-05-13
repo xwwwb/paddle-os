@@ -38,7 +38,8 @@ SRCS_C = \
 
 # 用户态APP
 SRC = \
-	$U/init.c
+	$U/init.c \
+	$U/sh.c
 	
 
 # 建立目标文件
@@ -66,7 +67,7 @@ disk.img: mkfs/mkfs README ${USER_APPS}
 
 # 生成内核
 kernel.elf: ${OBJS}
-	${LD} -z max-page-size=4096 -T $K/kernel.ld -o kernel.elf $^
+	${LD} ${LDFLAGS} -T $K/kernel.ld -o kernel.elf $^
 
 # 启动虚拟机
 run: all
@@ -90,29 +91,38 @@ qemu-debug: all
 	@echo "start qemu debug"
 	${QEMU} ${QFLAGS} -kernel kernel.elf -s -S
 
+
 # 清理文件
 clean:
-	rm -f ${OBJS} kernel.elf disk.img mkfs/mkfs user/usys.o user/usys.S ${USER_APPS} ${USER_OBJS}
+	rm -f ${OBJS} kernel.elf disk.img mkfs/mkfs user/*.o user/usys.S \
+	${USER_APPS} $U/initcode $U/initcode.out
 
 # 内核C到目标文件
-kernel/%.o : kernel/%.c
+${K}/%.o : ${K}/%.c
 	${CC} ${CFLAGS} -c -o $@ $<
 
 # 内核汇编到目标文件
-kernel/%.o : kernel/%.S
-	${CC} -I. -c -o $@ $<
+${K}/%.o : ${K}/%.S
+	${CC} ${CFLAGS} -I. -c -o $@ $<
 
 # 用户态C到目标文件
-user/%.o : user/%.c
+${U}/%.o : ${U}/%.c
 	${CC} ${CFLAGS} -c -o $@ $<
 
 # 用户态汇编到目标文件
-user/%.o : user/%.S
-	${CC} -I. -c -o $@ $<
+${U}/%.o : ${U}/%.S
+	${CC} ${CFLAGS} -I. -c -o $@ $<
+
+# initcode.S
+$U/initcode: $U/initcode.S
+	$(CC) $(CFLAGS) -march=rv64g -nostdinc -I. -Ikernel -c $U/initcode.S -o $U/initcode.o
+	$(LD) ${LDFLAGS} -N -e start -Ttext 0 -o $U/initcode.out $U/initcode.o
+	$(OBJCOPY) -S -O binary $U/initcode.out $U/initcode
+	@od -t xC ./user/initcode
 
 
 # 用户态的静态链接库
-ULIB = $U/usys.o $U/ulib.o
+ULIB = $U/usys.o $U/ulib.o $U/printf.o $U/umalloc.o
 
 # 生成系统调用相关文件
 $U/usys.S: $U/usys.py
@@ -120,4 +130,7 @@ $U/usys.S: $U/usys.py
 
 # 从.o 链接静态链接库 生成app文件
 %.paddle: %.o ${ULIB}
-	${LD} -z max-page-size=4096 -T $U/user.ld -o $@ $^
+	${LD} ${LDFLAGS} -T $U/user.ld -o $@ $^
+
+.PRECIOUS: user/%.o
+.PRECIOUS: kernel/%.o

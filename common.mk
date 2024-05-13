@@ -25,6 +25,8 @@ QFLAGS += -global virtio-mmio.force-legacy=false
 QFLAGS += -drive file=disk.img,if=none,format=raw,id=x0
 QFLAGS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
+LDFLAGS = -z max-page-size=4096
+
 GDB = gdb-multiarch
 CC = ${CROSS_COMPILE}gcc
 LD = ${CROSS_COMPILE}ld
