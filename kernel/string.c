@@ -97,3 +97,8 @@ int strlen(const char *s) {
   for (n = 0; s[n]; n++);
   return n;
 }
+
+// 替换掉gcc内置的memcpy 使用memmove
+void *memcpy(void *dst, const void *src, uint n) {
+  return memmove(dst, src, n);
+}

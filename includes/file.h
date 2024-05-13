@@ -23,6 +23,10 @@ struct inode {
   uint addrs[NDIRECT + 1];  // 映射地址 前12个直接映射 第13个间接映射
 };
 
+#define major(dev)  ((dev) >> 16 & 0xFFFF)
+#define minor(dev)  ((dev) & 0xFFFF)
+#define	mkdev(m,n)  ((uint)((m)<<16| (n)))
+
 // 映射设备号到设备函数
 struct devsw {
   int (*read)(int, uint64, int);

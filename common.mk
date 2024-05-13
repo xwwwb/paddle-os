@@ -15,6 +15,9 @@ CFLAGS += -mcmodel=medany
 CFLAGS += -O
 CFLAGS += -I./includes
 
+CFLAGS += -fno-omit-frame-pointer -Werror -gdwarf-2 -ffreestanding -fno-common -mno-relax
+CFLAGS += -fno-stack-protector -fno-pie -no-pie
+
 # QEMU = /opt/qemu-riscv64/bin/qemu-system-riscv64 # qemu 9.0.0
 # QEMU = qemu-system-riscv64 # qemu 4.3
 QEMU = /usr/local/bin/qemu-system-riscv64 # qemu 9.0
@@ -29,5 +32,8 @@ QFLAGS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
 GDB = gdb-multiarch
 CC = ${CROSS_COMPILE}gcc
+LD = ${CROSS_COMPILE}ld
 OBJCOPY = ${CROSS_COMPILE}objcopy
 OBJDUMP = ${CROSS_COMPILE}objdump
+
+PYTHON = python3

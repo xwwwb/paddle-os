@@ -27,6 +27,8 @@ struct cpu {
   struct context context;  // 用户态陷入的时候 记录陷入后内核态的状态
 };
 
+extern struct cpu cpus[NCPU];
+
 enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
 // 汇编中访问的时候 依次地址加8

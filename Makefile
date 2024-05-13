@@ -38,6 +38,7 @@ SRCS_C = \
 
 # 用户态APP
 SRC = \
+	$U/init.c
 	
 
 # 建立目标文件
@@ -59,14 +60,25 @@ all: kernel user disk.img
 
 # 生成内核
 kernel: ${OBJS}
-	@${CC} ${CFLAGS} -T $K/kernel.ld -o kernel.elf $^
+	${LD} -z max-page-size=4096 -T $K/kernel.ld -o kernel.elf $^
+
+# 用户态的静态链接库
+ULIB = $U/usys.o $U/ulib.o
+
+# 生成用户态 系统调用相关静态库
+$U/usys.o: $U/usys.S
+	$(CC) $(CFLAGS) -I. -c -o $U/usys.o $U/usys.S
+
+$U/usys.S: $U/usys.py
+	$(PYTHON) $U/usys.py > $U/usys.S
 
 # 生成用户态APP
-# 遍历USER_OBJS 根据user/user.ld 连接为.paddle文件
+# 遍历USER_APPS 根据user/user.ld 连接为.paddle文件
 user: ${USER_APPS}
 
-%.paddle: %.c
-	${CC} ${CFLAGS} -T $U/user.ld -o $@ $<
+# 从.o 链接静态链接库 生成app文件
+%.paddle: %.o ${ULIB}
+	${LD} -z max-page-size=4096 -T $U/user.ld -o $@ $^
 
 # 启动虚拟机
 run: all
@@ -94,9 +106,9 @@ qemu-debug: all
 	${CC} ${CFLAGS} -c -o $@ $<
 
 %.o : %.S
-	${CC} ${CFLAGS} -c -o $@ $<
+	${CC} -I./includes -c -o $@ $<
 
 
 # 清理文件
 clean:
-	rm -f ${OBJS} kernel.elf disk.img mkfs/mkfs ${USER_APPS} ${USER_OBJS}
+	rm -f ${OBJS} kernel.elf disk.img mkfs/mkfs user/usys.o user/usys.S ${USER_APPS} ${USER_OBJS}

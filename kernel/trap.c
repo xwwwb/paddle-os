@@ -15,7 +15,7 @@ extern char trampoline[], uservec[], userret[];
 // 定义在kernelvec.S 中 会调用kerneltrap
 void kernelvec();
 
-int devintr();
+extern int devintr();
 
 // 初始化陷入
 void trapinit(void) {
