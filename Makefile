@@ -65,15 +65,11 @@ kernel: ${OBJS}
 # 用户态的静态链接库
 ULIB = $U/usys.o $U/ulib.o
 
-# 生成用户态 系统调用相关静态库
-$U/usys.o: $U/usys.S
-	$(CC) $(CFLAGS) -I. -c -o $U/usys.o $U/usys.S
-
+# 生成系统调用相关文件
 $U/usys.S: $U/usys.py
 	$(PYTHON) $U/usys.py > $U/usys.S
 
 # 生成用户态APP
-# 遍历USER_APPS 根据user/user.ld 连接为.paddle文件
 user: ${USER_APPS}
 
 # 从.o 链接静态链接库 生成app文件
@@ -86,7 +82,7 @@ run: all
 
 # 生成格式化程序
 mkfs/mkfs: mkfs/mkfs.c
-	gcc -Werror -Wall -o mkfs/mkfs -I. mkfs/mkfs.c
+	gcc -Werror -I. -Wall -o mkfs/mkfs  mkfs/mkfs.c
 
 # 生成汇编
 code : ${OBJS}
@@ -102,12 +98,22 @@ qemu-debug: all
 	@echo "start qemu debug"
 	${QEMU} ${QFLAGS} -kernel kernel.elf -s -S
 
-%.o : %.c
+
+# 内核C到目标文件
+kernel/%.o : kernel/%.c
 	${CC} ${CFLAGS} -c -o $@ $<
 
-%.o : %.S
-	${CC} -I./includes -c -o $@ $<
+# 内核汇编到目标文件
+kernel/%.o : kernel/%.S
+	${CC} -I. -c -o $@ $<
 
+# 用户态C到目标文件
+user/%.o : user/%.c
+	${CC} ${CFLAGS} -c -o $@ $<
+
+# 用户态汇编到目标文件
+user/%.o : user/%.S
+	${CC} -I. -c -o $@ $<
 
 # 清理文件
 clean:

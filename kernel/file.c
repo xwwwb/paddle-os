@@ -1,13 +1,13 @@
-#include "types.h"
-#include "spinlock.h"
-#include "sleeplock.h"
-#include "riscv.h"
-#include "fs.h"
-#include "file.h"
-#include "stat.h"
-#include "defs.h"
-#include "params.h"
-#include "proc.h"
+#include "includes/types.h"
+#include "includes/spinlock.h"
+#include "includes/sleeplock.h"
+#include "includes/riscv.h"
+#include "includes/fs.h"
+#include "includes/file.h"
+#include "includes/stat.h"
+#include "includes/defs.h"
+#include "includes/params.h"
+#include "includes/proc.h"
 
 struct {
   struct spinlock lock;

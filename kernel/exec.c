@@ -1,12 +1,12 @@
 // 执行新的app
-#include "types.h"
-#include "params.h"
-#include "riscv.h"
-#include "spinlock.h"
-#include "sleeplock.h"
-#include "proc.h"
-#include "elf.h"
-#include "defs.h"
+#include "includes/types.h"
+#include "includes/params.h"
+#include "includes/riscv.h"
+#include "includes/spinlock.h"
+#include "includes/sleeplock.h"
+#include "includes/proc.h"
+#include "includes/elf.h"
+#include "includes/defs.h"
 
 static int loadseg(pde_t *, uint64, struct inode *, uint, uint);
 

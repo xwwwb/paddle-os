@@ -6,16 +6,16 @@
 // virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 //
 
-#include "types.h"
-#include "riscv.h"
-#include "defs.h"
-#include "params.h"
-#include "memlayout.h"
-#include "spinlock.h"
-#include "sleeplock.h"
-#include "fs.h"
-#include "buf.h"
-#include "virtio.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/defs.h"
+#include "includes/params.h"
+#include "includes/memlayout.h"
+#include "includes/spinlock.h"
+#include "includes/sleeplock.h"
+#include "includes/fs.h"
+#include "includes/buf.h"
+#include "includes/virtio.h"
 
 // the address of virtio mmio register r.
 #define R(r) ((volatile uint32 *)(VIRTIO0 + (r)))

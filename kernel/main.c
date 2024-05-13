@@ -1,7 +1,7 @@
 // 初始化操作系统
-#include "types.h"
-#include "riscv.h"
-#include "defs.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/defs.h"
 
 // 标记0号CPU的启动状态
 volatile static int started = 0;

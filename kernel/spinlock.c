@@ -1,9 +1,9 @@
-#include "types.h"
-#include "riscv.h"
-#include "defs.h"
-#include "spinlock.h"
-#include "params.h"
-#include "proc.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/defs.h"
+#include "includes/spinlock.h"
+#include "includes/params.h"
+#include "includes/proc.h"
 
 // 初始化自旋锁
 void initlock(struct spinlock *lk, char *name) {
@@ -32,8 +32,7 @@ void acquire(struct spinlock *lk) {
    *  将1写入锁 如果返回1 则说明暂时拿不到锁 别人还在用 写入1也不影响
    *  如果返回0 说明拿到了锁 并且同时写入了1 将锁占领起来
    */
-  while (__sync_lock_test_and_set(&lk->locked, 1) != 0)
-    ;
+  while (__sync_lock_test_and_set(&lk->locked, 1) != 0);
   // 让GCC确保没有loads或者stores跨越这里
   // 这是为了保证对临界区内存的访问严格发生在锁被获取之后
   // 在RISC-V架构上，这会生成一个fence指令

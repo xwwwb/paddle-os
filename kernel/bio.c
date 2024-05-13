@@ -1,12 +1,12 @@
 // IO缓存 缓存磁盘
-#include "types.h"
-#include "params.h"
-#include "riscv.h"
-#include "spinlock.h"
-#include "sleeplock.h"
-#include "fs.h"
-#include "buf.h"
-#include "defs.h"
+#include "includes/types.h"
+#include "includes/params.h"
+#include "includes/riscv.h"
+#include "includes/spinlock.h"
+#include "includes/sleeplock.h"
+#include "includes/fs.h"
+#include "includes/buf.h"
+#include "includes/defs.h"
 
 struct {
   struct spinlock lock;  // 操作缓存双向链表是原子的

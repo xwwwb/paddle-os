@@ -1,10 +1,10 @@
-#include "types.h"
-#include "riscv.h"
-#include "spinlock.h"
-#include "params.h"
-#include "proc.h"
-#include "memlayout.h"
-#include "defs.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/spinlock.h"
+#include "includes/params.h"
+#include "includes/proc.h"
+#include "includes/memlayout.h"
+#include "includes/defs.h"
 
 struct spinlock tickslock;
 uint ticks;  // 用于睡眠系统调用
@@ -98,7 +98,7 @@ void usertrap(void) {
 
   // 保存陷入发生时用户态的程序计数器
   p->trapframe->epc = r_sepc();
-  
+
   if (r_scause() == 8) {
     // 系统调用
     // 如果当前进程是被标记为killed 就在此时处理

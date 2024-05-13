@@ -1,7 +1,7 @@
-#include "types.h"
-#include "riscv.h"
-#include "memlayout.h"
-#include "defs.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/memlayout.h"
+#include "includes/defs.h"
 
 pagetable_t kernel_pagetable;
 

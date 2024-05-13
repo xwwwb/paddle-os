@@ -1,11 +1,11 @@
 // CPU相关的代码
-#include "types.h"
-#include "riscv.h"
-#include "params.h"
-#include "memlayout.h"
-#include "defs.h"
-#include "spinlock.h"
-#include "proc.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/params.h"
+#include "includes/memlayout.h"
+#include "includes/defs.h"
+#include "includes/spinlock.h"
+#include "includes/proc.h"
 
 // CPU结构体数量
 struct cpu cpus[NCPU];

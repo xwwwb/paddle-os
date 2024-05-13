@@ -3,10 +3,9 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/includes",
+                "${workspaceFolder}",
                 "/usr/include/aarch64-linux-gnu",
-                "/usr/include",
-                "${workspaceFolder}/"
+                "/usr/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/riscv64-unknown-elf-gcc",

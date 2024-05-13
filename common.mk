@@ -12,22 +12,17 @@ CFLAGS = -nostdlib -fno-builtin -march=rv64g -g -Wall
 # 加入-O 结构体复制的时候不会报错 memcpy undefined 可以观察前后的objdump -S proc.o
 # https://gcc.gnu.org/onlinedocs/gcc-13.2.0/gcc/Optimize-Options.html#index-O
 CFLAGS += -mcmodel=medany
-CFLAGS += -O
-CFLAGS += -I./includes
+CFLAGS += -O -I.
 
 CFLAGS += -fno-omit-frame-pointer -Werror -gdwarf-2 -ffreestanding -fno-common -mno-relax
 CFLAGS += -fno-stack-protector -fno-pie -no-pie
 
-# QEMU = /opt/qemu-riscv64/bin/qemu-system-riscv64 # qemu 9.0.0
-# QEMU = qemu-system-riscv64 # qemu 4.3
-QEMU = /usr/local/bin/qemu-system-riscv64 # qemu 9.0
+QEMU = qemu-system-riscv64
 CPUS := 8
 
 QFLAGS = -nographic -smp ${CPUS} -machine virt -bios none
 QFLAGS += -global virtio-mmio.force-legacy=false
-# QEMU 添加设备
 QFLAGS += -drive file=disk.img,if=none,format=raw,id=x0
-# QEMU 添加总线
 QFLAGS += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
 GDB = gdb-multiarch

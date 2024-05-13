@@ -1,7 +1,7 @@
-#include "types.h"
-#include "memlayout.h"
-#include "riscv.h"
-#include "defs.h"
+#include "includes/types.h"
+#include "includes/memlayout.h"
+#include "includes/riscv.h"
+#include "includes/defs.h"
 
 // 初始化plic优先级
 void plicinit(void) {

@@ -1,8 +1,8 @@
-#include "types.h"
-#include "riscv.h"
-#include "defs.h"
-#include "memlayout.h"
-#include "spinlock.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/defs.h"
+#include "includes/memlayout.h"
+#include "includes/spinlock.h"
 
 // http://byterunner.com/16550.html
 

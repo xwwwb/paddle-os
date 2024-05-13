@@ -1,12 +1,12 @@
 // 磁盘事务
-#include "types.h"
-#include "params.h"
-#include "spinlock.h"
-#include "fs.h"
-#include "riscv.h"
-#include "defs.h"
-#include "sleeplock.h"
-#include "buf.h"
+#include "includes/types.h"
+#include "includes/params.h"
+#include "includes/spinlock.h"
+#include "includes/fs.h"
+#include "includes/riscv.h"
+#include "includes/defs.h"
+#include "includes/sleeplock.h"
+#include "includes/buf.h"
 // logheader放在log区的第一个块里面
 struct logheader {
   int n;  // n记录了当前有几个块在log区

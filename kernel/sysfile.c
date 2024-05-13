@@ -1,17 +1,17 @@
 // 文件系统相关系统调用
 // 主要是一些参数检查
-#include "types.h"
-#include "params.h"
-#include "syscall.h"
-#include "riscv.h"
-#include "spinlock.h"
-#include "sleeplock.h"
-#include "proc.h"
-#include "defs.h"
-#include "fs.h"
-#include "file.h"
-#include "stat.h"
-#include "fcntl.h"
+#include "includes/types.h"
+#include "includes/params.h"
+#include "includes/syscall.h"
+#include "includes/riscv.h"
+#include "includes/spinlock.h"
+#include "includes/sleeplock.h"
+#include "includes/proc.h"
+#include "includes/defs.h"
+#include "includes/fs.h"
+#include "includes/file.h"
+#include "includes/stat.h"
+#include "includes/fcntl.h"
 
 // 传入文件描述符的参数的下标n
 // 取参数的值作为文件描述符 检查其正确性

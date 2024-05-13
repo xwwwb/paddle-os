@@ -1,10 +1,10 @@
 #include <stdarg.h>
-#include "types.h"
-#include "riscv.h"
-#include "defs.h"
-#include "params.h"
-#include "spinlock.h"
-#include "proc.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/defs.h"
+#include "includes/params.h"
+#include "includes/spinlock.h"
+#include "includes/proc.h"
 
 // 标记内核是否崩溃
 volatile int panicked = 0;

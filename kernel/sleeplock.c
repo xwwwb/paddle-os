@@ -1,10 +1,10 @@
-#include "types.h"
-#include "riscv.h"
-#include "spinlock.h"
-#include "sleeplock.h"
-#include "params.h"
-#include "proc.h"
-#include "defs.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/spinlock.h"
+#include "includes/sleeplock.h"
+#include "includes/params.h"
+#include "includes/proc.h"
+#include "includes/defs.h"
 
 // 初始化睡眠锁
 void initsleeplock(struct sleeplock *lk, char *name) {

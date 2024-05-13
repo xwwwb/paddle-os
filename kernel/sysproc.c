@@ -1,11 +1,11 @@
 // 进程相关的系统调用
-#include "types.h"
-#include "riscv.h"
-#include "spinlock.h"
-#include "sleeplock.h"
-#include "params.h"
-#include "proc.h"
-#include "defs.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/spinlock.h"
+#include "includes/sleeplock.h"
+#include "includes/params.h"
+#include "includes/proc.h"
+#include "includes/defs.h"
 
 // 进程退出 参数是退出状态
 uint64 sys_exit(void) {

@@ -1,5 +1,5 @@
-#include "riscv.h"
-#include "memlayout.h"
+#include "includes/riscv.h"
+#include "includes/memlayout.h"
 
 .section trampsec
 .global trampoline

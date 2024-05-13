@@ -1,8 +1,8 @@
 // 初始化寄存器
-#include "types.h"
-#include "memlayout.h"
-#include "params.h"
-#include "riscv.h"
+#include "includes/types.h"
+#include "includes/memlayout.h"
+#include "includes/params.h"
+#include "includes/riscv.h"
 
 // main.c中定义
 void main();

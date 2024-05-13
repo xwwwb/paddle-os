@@ -1,13 +1,13 @@
 // 控制台设备
-#include "types.h"
-#include "riscv.h"
-#include "defs.h"
-#include "spinlock.h"
-#include "sleeplock.h"
-#include "params.h"
-#include "proc.h"
-#include "fs.h"
-#include "file.h"
+#include "includes/types.h"
+#include "includes/riscv.h"
+#include "includes/defs.h"
+#include "includes/spinlock.h"
+#include "includes/sleeplock.h"
+#include "includes/params.h"
+#include "includes/proc.h"
+#include "includes/fs.h"
+#include "includes/file.h"
 
 // 退格键
 #define BACKSPACE 0x100
