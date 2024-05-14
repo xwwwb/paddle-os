@@ -45,6 +45,7 @@ int main(void) {
       // 这里的pid是shell的pid 因为fork会在父进程返回子进程的pid
       if (wpid == pid) {
         // shell退出了 重新启动shell
+        printf("shell 异常退出 正在重启\n");
         break;
       } else if (wpid < 0) {
         printf("等待子进程退出失败\n");

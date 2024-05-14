@@ -75,7 +75,7 @@ void ls(char *path) {
           continue;
         }
         // 打印文件名 文件类型 文件inode 文件大小
-        printf("%s %d %d %d\n", fmtname(buf), st.type, st.ino, st.size);
+        printf("%s %d\t%d\t%d\n", fmtname(buf), st.type, st.ino, st.size);
       }
       break;
     }
@@ -84,7 +84,7 @@ void ls(char *path) {
 }
 
 int main(int argc, char *argv[]) {
-  printf("filename       type inode size\n");
+  printf("filename       type\tinode\tsize\n");
   int i;
   // 如果没有参数，则默认显示当前目录
   if (argc < 2) {

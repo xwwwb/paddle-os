@@ -42,8 +42,16 @@ SRC = \
 	$U/sh.c \
 	$U/helloworld.c \
 	$U/ls.c \
-	$U/cat.c
-	
+	$U/cat.c \
+	$U/echo.c \
+	$U/forktest.c \
+	$U/grep.c \
+	$U/kill.c \
+	$U/ln.c \
+	$U/mkdir.c \
+	$U/rm.c \
+	$U/wc.c \
+	$U/zombie.c
 
 # 建立目标文件
 OBJS = ${SRCS_ASM:.S=.o}
