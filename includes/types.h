@@ -7,6 +7,5 @@ typedef unsigned short uint16;
 typedef unsigned int uint32;
 typedef unsigned long uint64;
 
-// Page Directory Entry
 // 其按顺序存放页表地址
 typedef uint64 pde_t;

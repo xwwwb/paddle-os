@@ -7,6 +7,11 @@
         "user.h": "c",
         "spinlock.h": "c",
         "sleeplock.h": "c",
-        "fs.h": "c"
+        "fs.h": "c",
+        "riscv.h": "c",
+        "defs.h": "c",
+        "proc.h": "c",
+        "file.h": "c",
+        "params.h": "c"
     }
 }

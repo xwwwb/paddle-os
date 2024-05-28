@@ -100,6 +100,7 @@ timervec:
     sd a3, 0(a1) # 写回mtimecmp的内存
 
     # 触发软中断 让s模式处理时钟中断
+    # 这里会引发嵌套中断吗？
     li a1, 2
     # sip寄存器的第一位是SSIP 写入1可以触发软中断也就是10
     csrw sip, a1

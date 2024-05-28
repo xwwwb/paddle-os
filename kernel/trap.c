@@ -108,6 +108,7 @@ void usertrap(void) {
     }
 
     // 系统调用需要让epc向下移动32位 否则会重复触发系统调用
+    // 　加４？
     p->trapframe->epc += 4;
 
     intr_on();
